@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>咪咪 24 歲手帳生日日記！🍮 ぼく、プリン</title>
+
+  <!-- GSAP 動畫核心庫、滾動庫、官方 Draggable 拖曳庫 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- YouTube 官方播放 API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <!-- 日系字體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --purin-yellow: #FFD54F;
+      --purin-light-yellow: #FFF8E1;
+      --purin-cream-bg: #FFFDF2;
+      --purin-brown: #5C3D28;
+      --purin-brown-deep: #432818;
+      --caramel-orange: #FFA000;
+      --fukubukuro-red: #D32F2F;
+      --gizmo-blue: #2196F3;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--purin-cream-bg);
+      color: var(--purin-brown);
+      font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    .paper-texture {
+      position: fixed; inset: 0;
+      background-image: radial-gradient(var(--caramel-orange) 1px, transparent 1px);
+      background-size: 28px 28px; opacity: 0.16; pointer-events: none; z-index: 1;
+    }
+
+    /* 屁屁米字「＊」游標 */
+    @media (pointer: fine) {
+      .cursor-dot {
+        position: fixed; width: 6px; height: 6px; background-color: var(--purin-brown);
+        border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+      }
+      .cursor-butt-follower {
+        position: fixed; width: 38px; height: 38px; background-color: #FFE082;
+        border: 2px solid var(--purin-brown); border-radius: 50%; pointer-events: none;
+        z-index: 9998; transform: translate(-50%, -50%); display: flex; align-items: center;
+        justify-content: center; box-shadow: 0 4px 10px rgba(92, 61, 40, 0.15);
+        transition: width 0.25s, height 0.25s, transform 0.15s ease-out;
+      }
+      .butt-star { font-size: 19px; font-weight: 900; color: var(--purin-brown); line-height: 1; user-select: none; }
+      .butt-tail {
+        position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+        width: 6px; height: 9px; background-color: #FFE082; border: 2px solid var(--purin-brown);
+        border-bottom: none; border-radius: 4px 4px 0 0;
+      }
+      .cursor-butt-follower.hovered {
+        width: 48px; height: 48px; background-color: #FFD54F;
+        animation: buttWiggle 0.6s infinite ease-in-out alternate;
+      }
+      @keyframes buttWiggle {
+        0% { transform: translate(-50%, -50%) rotate(-12deg) scale(1.15); }
+        100% { transform: translate(-50%, -50%) rotate(12deg) scale(1.15); }
+      }
+    }
+
+    /* 音樂控制艙 */
+    .audio-deck {
+      position: fixed; top: 18px; right: 18px; background: #FFFFFF;
+      border: 2.5px solid var(--purin-brown); border-radius: 30px;
+      padding: 6px 14px 6px 10px; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 6px 20px rgba(92, 61, 40, 0.15); z-index: 1000;
+    }
+    .music-play-btn {
+      width: 36px; height: 36px; background: var(--purin-light-yellow);
+      border-radius: 50%; border: 1.5px solid var(--caramel-orange);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer; user-select: none;
+    }
+    .music-play-btn.playing { animation: jelly 1.2s infinite ease-in-out; }
+    @keyframes jelly {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.15, 0.85) rotate(-10deg); }
+      75% { transform: scale(0.9, 1.1) rotate(10deg); }
+    }
+    .mute-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
+    .volume-slider-wrapper { display: flex; align-items: center; width: 75px; }
+    .volume-slider {
+      -webkit-appearance: none; width: 100%; height: 6px;
+      border-radius: 5px; background: #FFE082; outline: none; cursor: pointer;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--purin-brown-deep); border: 2px solid #FFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer;
+    }
+    .yt-hidden-frame {
+      position: fixed; bottom: 0; right: 0; width: 120px; height: 80px;
+      opacity: 0.001; pointer-events: none; z-index: -10;
+    }
+
+    /* ================= 第一幕：防破圖立體信封 ================= */
+    .envelope-screen {
+      position: relative; height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; perspective: 1000px; z-index: 2;
+    }
+    .envelope-3d-scene { position: relative; will-change: transform; }
+    .envelope-wrapper { position: relative; width: 320px; height: 220px; cursor: pointer; }
+    .envelope-base {
+      position: absolute; inset: 0; background: #FFE885;
+      border: 3px solid var(--purin-brown); border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(92, 61, 40, 0.18); z-index: 1;
+    }
+    .envelope-letter {
+      position: absolute; bottom: 12px; left: 16px; right: 16px; height: 190px;
+      background: #FFFFFF; border-radius: 10px; border: 2px dashed var(--caramel-orange);
+      padding: 14px; text-align: center; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; z-index: 2;
+      box-shadow: 0 -2px 10px rgba(92, 61, 40, 0.08);
+      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .envelope-letter h3 { font-family: 'Caveat', cursive; font-size: 32px; color: var(--purin-brown); }
+    .envelope-pocket {
+      position: absolute; inset: 0; clip-path: polygon(0% 100%, 50% 50%, 100% 100%, 100% 0%, 100% 100%, 0% 100%);
+      background: var(--purin-yellow); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+      z-index: 3; pointer-events: none;
+    }
+    .envelope-pocket-sides {
+      position: absolute; inset: 0; clip-path: polygon(0 0, 0% 100%, 100% 100%, 100% 0, 50% 50%);
+      background: #FFCA28; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px;
+      opacity: 0.95; z-index: 3; pointer-events: none;
+    }
+    .envelope-prints { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+    .mini-char { position: absolute; user-select: none; font-size: 20px; }
+    .envelope-flap {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      clip-path: polygon(0 0, 100% 0, 50% 52%); background: var(--purin-yellow);
+      border-top-left-radius: 16px; border-top-right-radius: 16px; transform-origin: top;
+      transition: transform 0.6s ease; z-index: 5;
+    }
+    .seal-beret {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 58px; height: 40px; background: var(--purin-brown-deep); border-radius: 50%;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.3); cursor: pointer; z-index: 6;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .seal-beret::before {
+      content: ""; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+      width: 6px; height: 9px; background: var(--purin-brown-deep); border-radius: 3px;
+    }
+    .envelope-wrapper:hover .seal-beret { transform: translate(-50%, -50%) scale(1.12) rotate(-6deg); }
+    .envelope-wrapper.open .envelope-flap { transform: rotateX(180deg); z-index: 1; transition: transform 0.55s ease, z-index 0.2s 0.25s; }
+    .envelope-wrapper.open .seal-beret { opacity: 0; pointer-events: none; }
+    .envelope-wrapper.open .envelope-letter { transform: translateY(-110px); z-index: 6; transition: transform 0.8s 0.25s cubic-bezier(0.16, 1, 0.3, 1), z-index 0.1s 0.4s; }
+
+    .hint-text {
+      margin-top: 36px; font-size: 15px; font-weight: 700; letter-spacing: 2px;
+      color: var(--purin-brown); background: var(--purin-light-yellow);
+      padding: 6px 18px; border-radius: 20px; border: 2px solid var(--caramel-orange);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+    /* ================= 第二幕：手帳頁面 ================= */
+    .content-container {
+      position: relative; max-width: 580px; margin: 0 auto;
+      padding: 30px 14px 140px; display: none; opacity: 0; z-index: 2;
+    }
+
+    .purin-stationery-card {
+      background: var(--purin-yellow); border: 3px solid var(--purin-brown);
+      border-radius: 24px; padding: 16px 14px 20px; box-shadow: 0 14px 35px rgba(92, 61, 40, 0.15);
+      margin-bottom: 50px; position: relative;
+    }
+    .stationery-header {
+      display: flex; justify-content: space-around; align-items: flex-end;
+      padding: 4px 4px 12px; text-align: center;
+    }
+    .stretch-item span { font-size: 12px; font-weight: 900; color: var(--purin-brown); }
+    .stretch-avatar { font-size: 30px; }
+    .stationery-bottom-gingham {
+      margin-top: 14px;
+      background: repeating-linear-gradient(45deg, var(--caramel-orange), var(--caramel-orange) 8px, #FFF9C4 8px, #FFF9C4 16px);
+      border-radius: 10px; border: 2px solid var(--purin-brown); padding: 8px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .gingham-title {
+      font-family: 'Zen Maru Gothic', cursive; font-size: 16px; font-weight: 900;
+      color: var(--purin-brown); background: rgba(255,255,255,0.85); padding: 2px 8px; border-radius: 6px;
+    }
+
+    /* 手帳紙塊容器 (12 個月份通用) */
+    .monthly-paper-card {
+      background: #FFFFFF; border: 3px solid var(--purin-brown);
+      border-radius: 18px; padding: 14px 14px 28px; margin: 45px 0 75px;
+      box-shadow: 0 16px 38px rgba(92, 61, 40, 0.14); position: relative;
+      opacity: 0; transform: translateY(60px) scale(0.92);
+      transition: box-shadow 0.25s ease;
+      overflow: visible;
+    }
+
+    .month-tab-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--caramel-orange); color: #FFF; font-weight: 900;
+      font-size: 14px; padding: 5px 16px; border-radius: 20px;
+      margin-bottom: 12px; border: 2px solid var(--purin-brown);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .washi-tape-top {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      width: 90px; height: 22px; background: rgba(255, 213, 79, 0.85);
+      border-left: 2px dashed rgba(255,255,255,0.7); border-right: 2px dashed rgba(255,255,255,0.7);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08); z-index: 5;
+    }
+
+    .goodnotes-sheet-wrapper {
+      position: relative; width: 100%; border-radius: 10px;
+      border: 1px solid #EFE4D6; background: #FAFAFA;
+    }
+    .goodnotes-sheet-img { width: 100%; height: auto; display: block; pointer-events: none; }
+
+    /* 螢光筆觸發點 */
+    .highlighter-hotspot {
+      position: absolute; cursor: pointer; border-radius: 4px;
+      background: rgba(255, 235, 59, 0.5); box-shadow: 0 0 10px rgba(255, 235, 59, 0.7);
+      transition: all 0.25s ease; z-index: 10; border-bottom: 2px dashed rgba(249, 160, 63, 0.9);
+    }
+    .highlighter-hotspot::before { content: ""; position: absolute; top: -12px; bottom: -12px; left: -8px; right: -8px; }
+    .highlighter-hotspot:hover, .highlighter-hotspot:active {
+      background: rgba(255, 215, 0, 0.8); transform: scale(1.05);
+      box-shadow: 0 0 16px rgba(255, 160, 0, 0.9);
+    }
+    .hotspot-hint-bubble {
+      position: absolute; top: -22px; right: -12px;
+      background: #FFF; border: 1.5px solid var(--purin-brown);
+      color: var(--purin-brown); font-size: 11px; font-weight: 900;
+      padding: 1px 6px; border-radius: 10px; white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15); pointer-events: none;
+    }
+
+    /* 右下角和風素色小福袋 (無 Emoji) */
+    .fukubukuro-pouch {
+      position: absolute; bottom: 12px; right: 14px;
+      width: 58px; height: 64px; cursor: pointer; z-index: 35;
+      user-select: none; transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s;
+    }
+    .fukubukuro-pouch:hover { transform: scale(1.12) rotate(-4deg); }
+    .fukubukuro-pouch.drop-hover {
+      transform: scale(1.3) !important; filter: drop-shadow(0 0 14px #FFA000);
+      animation: pouchHeartbeat 0.4s infinite alternate;
+    }
+    @keyframes pouchHeartbeat { 0% { transform: scale(1.25); } 100% { transform: scale(1.38); } }
+
+    .pouch-body {
+      position: absolute; bottom: 0; width: 100%; height: 48px;
+      background: linear-gradient(135deg, #FFE082, #FFCA28);
+      border: 2.5px solid var(--purin-brown); border-radius: 12px 12px 18px 18px;
+      box-shadow: 0 6px 14px rgba(92, 61, 40, 0.2);
+    }
+    .pouch-ruffle {
+      position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 15px; background: #FFD54F;
+      border: 2px solid var(--purin-brown); border-radius: 8px 8px 3px 3px; z-index: 1;
+    }
+    .pouch-ribbon {
+      position: absolute; top: 13px; left: 50%; transform: translateX(-50%);
+      width: 20px; height: 6px; background: var(--fukubukuro-red);
+      border-radius: 4px; z-index: 3; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .pouch-ribbon::after {
+      content: ""; position: absolute; top: 5px; left: 3px;
+      width: 4px; height: 8px; background: var(--fukubukuro-red);
+      box-shadow: 10px 0 0 var(--fukubukuro-red);
+    }
+    .pouch-count-pill {
+      position: absolute; top: -8px; right: -8px;
+      background: var(--fukubukuro-red); color: #FFF; font-size: 10px; font-weight: 900;
+      padding: 2px 6px; border-radius: 10px; border: 1.5px solid #FFF;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.25); z-index: 5;
+    }
+
+    /* ================= 自由調整大小與角度的拍立得照片 ================= */
+    .draggable-photo-pool {
+      position: absolute; inset: 0; pointer-events: none; z-index: 20;
+    }
+
+    .transformable-polaroid {
+      position: absolute;
+      width: 175px; /* 起始寬度，拉角點可無限縮放 */
+      background: #FFFFFF;
+      padding: 8px 8px 18px 8px;
+      border-radius: 4px;
+      box-shadow: 0 10px 24px rgba(67, 40, 24, 0.2);
+      border: 1.5px solid #EFE4D6;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      pointer-events: auto;
+      display: none;
+      will-change: transform, width;
+      transform-origin: center center;
+    }
+    .transformable-polaroid:active { cursor: grabbing; }
+
+    .transformable-polaroid img {
+      width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover;
+      border-radius: 2px; display: block; pointer-events: none;
+    }
+    .transformable-polaroid .caption {
+      margin-top: 8px; text-align: center; font-family: 'Zen Maru Gothic', cursive;
+      font-size: 12px; font-weight: 700; color: var(--purin-brown); line-height: 1.3; pointer-events: none;
+    }
+    .draggable-tape {
+      position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+      width: 55px; height: 16px; background: rgba(255, 213, 79, 0.85);
+      border-left: 2px dashed rgba(255,255,255,0.7); border-right: 2px dashed rgba(255,255,255,0.7);
+      pointer-events: none;
+    }
+
+    /* Word / Excel 選取藍框 */
+    .transform-gizmo {
+      position: absolute; inset: -4px; border: 1.5px dashed var(--gizmo-blue);
+      border-radius: 6px; pointer-events: none; display: none;
+    }
+    .transformable-polaroid.selected .transform-gizmo { display: block; }
+
+    /* 頂部旋轉桿 ⟳ (360° 任意旋轉) */
+    .rot-stem {
+      position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+      width: 1.5px; height: 24px; background: var(--gizmo-blue); pointer-events: none;
+    }
+    .rot-handle {
+      position: absolute; top: -36px; left: 50%; transform: translateX(-50%);
+      width: 22px; height: 22px; background: #FFFFFF; border: 1.5px solid var(--gizmo-blue);
+      border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.2); cursor: crosshair;
+      pointer-events: auto; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--gizmo-blue); font-weight: 900; line-height: 1;
+    }
+    .rot-handle:hover { background: var(--gizmo-blue); color: #FFF; transform: translateX(-50%) scale(1.2); }
+
+    /* 四角縮放節點 ● (無限自由等比放大縮小) */
+    .scale-handle {
+      position: absolute; width: 14px; height: 14px; background: #FFFFFF;
+      border: 1.5px solid var(--gizmo-blue); border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25); pointer-events: auto;
+    }
+    .scale-handle.handle-br { bottom: -7px; right: -7px; cursor: nwse-resize; }
+    .scale-handle.handle-bl { bottom: -7px; left: -7px; cursor: nesw-resize; }
+    .scale-handle.handle-tr { top: -7px; right: -7px; cursor: nesw-resize; }
+    .scale-handle.handle-tl { top: -7px; left: -7px; cursor: nwse-resize; }
+    .scale-handle:hover { background: var(--gizmo-blue); transform: scale(1.3); }
+
+    .celebrate-btn {
+      display: block; margin: 60px auto 0; background-color: var(--caramel-orange);
+      color: #FFF; border: 3px solid var(--purin-brown); padding: 16px 36px;
+      font-size: 17px; border-radius: 40px; font-weight: 900;
+      box-shadow: 0 10px 25px rgba(255, 160, 0, 0.4); cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="paper-texture"></div>
+
+  <!-- 游標小點 -->
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- 布丁狗屁屁米字 (＊) 游標 -->
+  <div class="cursor-butt-follower" id="cursorButtFollower">
+    <div class="butt-tail"></div>
+    <div class="butt-star">＊</div>
+  </div>
+
+  <!-- 音樂控制艙 -->
+  <div class="audio-deck hoverable" id="audioDeck">
+    <div class="music-play-btn" id="playToggleBtn" title="播放 / 暫停音樂">🍮</div>
+    <button class="mute-btn" id="muteToggleBtn" title="靜音 / 取消靜音">🔊</button>
+    <div class="volume-slider-wrapper">
+      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="75" title="音量調節" />
+    </div>
+  </div>
+
+  <div class="yt-hidden-frame">
+    <div id="ytPlayer"></div>
+  </div>
+
+  <!-- 第一幕：3D 視差信封 -->
+  <section class="envelope-screen" id="envelopeScreen">
+    <div class="envelope-3d-scene" id="envelopeScene">
+      <div class="envelope-wrapper hoverable" id="envelope">
+        <div class="envelope-base"></div>
+        <div class="envelope-letter">
+          <h3>To 咪咪 💌</h3>
+          <p style="font-size: 13px; color: var(--purin-brown); font-weight: 700; margin-top: 5px;">
+            ぼく、プリン！翻開手帳日記 📖
+          </p>
+        </div>
+        <div class="envelope-pocket"></div>
+        <div class="envelope-pocket-sides"></div>
+        <div class="envelope-prints">
+          <span class="mini-char" style="top: 15px; left: 18px; transform: rotate(-10deg);">🐶</span>
+          <span class="mini-char" style="bottom: 22px; left: 24px; font-weight: 900;">＊🍮</span>
+          <span class="mini-char" style="top: 18px; right: 20px; transform: rotate(12deg);">🐹</span>
+          <span class="mini-char" style="bottom: 24px; right: 26px; transform: rotate(-8deg);">🐾🍮</span>
+          <span class="mini-char" style="top: 76px; left: 14px; font-size: 15px;">🦴</span>
+          <span class="mini-char" style="top: 78px; right: 16px; font-size: 15px;">🍒</span>
+        </div>
+        <div class="envelope-flap"></div>
+        <div class="seal-beret" title="輕碰貝雷帽打開信封"></div>
+      </div>
+    </div>
+    <div class="hint-text">✨ 輕碰貝雷帽 翻開手帳日記 ✨</div>
+  </section>
+
+  <!-- 第二幕：手帳冊 (2025/10 ~ 2026/09 完整 12 個月份) -->
+  <main class="content-container" id="mainContent">
+    
+    <!-- 封面長信 (Goodnotes 第 1 頁) -->
+    <div class="purin-stationery-card">
+      <div class="stationery-header">
+        <div class="stretch-item"><span>右にのび～</span><div class="stretch-avatar">🐶🐹</div></div>
+        <div class="stretch-item"><span>前にものび～</span><div class="stretch-avatar">🍮🐾</div></div>
+        <div class="stretch-item"><span>左にのび～</span><div class="stretch-avatar">🐹🐶</div></div>
+      </div>
+
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/page1.png" alt="第1頁手寫長信" onerror="this.src='https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800';" />
+      </div>
+
+      <div class="stationery-bottom-gingham">
+        <div class="gingham-title">ぼく、プリン</div>
+        <div class="sleepy-purin">🍮🐶💤</div>
+      </div>
+    </div>
+
+    <!-- ================= 2025.10 ~ 2026.09 (12 個月份卡片結構) ================= -->
+
+    <!-- 月份 1: 2025.10 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2025_10">
+      <div class="washi-tape-top"></div>
+      <div class="month-tab-badge">📅 2025 . 10 ・ 秋日回憶 🍂</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2025_10.png" alt="2025年10月手帳" onerror="this.src='https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800';" />
+        <div class="highlighter-hotspot hoverable" style="top: 10%; left: 6%; width: 42%; height: 3.5%;" data-target-pouch="pouch_2025_10">
+          <span class="hotspot-hint-bubble">點開回憶✨</span>
+        </div>
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2025_10" data-target-pool="pool_2025_10">
+        <div class="pouch-count-pill" id="count_pool_2025_10">3</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2025_10">
+        <div class="transformable-polaroid" data-id="p_2025_10_1" data-default-x="25" data-default-y="60" style="top: 15%; left: 8%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600" alt="拍貼機" /><div class="caption">拍貼機四連拍 📸</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2025_10_2" data-default-x="230" data-default-y="180" style="top: 36%; right: 8%;">
+          <div class="draggable-tape" style="background: rgba(255, 138, 128, 0.8);"></div><img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600" alt="大安公園" /><div class="caption">在大安公園拍咪 🌳</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2025_10_3" data-default-x="40" data-default-y="320" style="top: 58%; left: 12%;">
+          <div class="draggable-tape" style="background: rgba(129, 199, 132, 0.8);"></div><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600" alt="可達鴨" /><div class="caption">送你的寶可夢可達鴨 🦆</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 2: 2025.11 (TWICE) -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2025_11">
+      <div class="washi-tape-top" style="background: rgba(255, 138, 128, 0.8);"></div>
+      <div class="month-tab-badge" style="background: #E57373;">🍭 2025 . 11 ・ TWICE 與特別的日子 ✨</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2025_11.png" alt="2025年11月手帳" onerror="this.src='https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800';" />
+        <div class="highlighter-hotspot hoverable" style="top: 42%; left: 6%; width: 44%; height: 3.5%;" data-target-pouch="pouch_2025_11">
+          <span class="hotspot-hint-bubble">🍭演唱會特輯</span>
+        </div>
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2025_11" data-target-pool="pool_2025_11">
+        <div class="pouch-count-pill" id="count_pool_2025_11">3</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2025_11">
+        <div class="transformable-polaroid" data-id="p_2025_11_1" data-default-x="25" data-default-y="80" style="top: 18%; left: 10%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600" alt="ONCE" /><div class="caption">ONCE 現場應援海 🌊</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2025_11_2" data-default-x="230" data-default-y="210" style="top: 38%; right: 10%;">
+          <div class="draggable-tape" style="background: rgba(255, 138, 128, 0.8);"></div><img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600" alt="大合唱" /><div class="caption">大合唱真的好感動 😭</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2025_11_3" data-default-x="35" data-default-y="340" style="top: 58%; left: 15%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600" alt="自拍" /><div class="caption">散場後超瘋狂大自拍 💖</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 3: 2025.12 (溫泉之旅) -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2025_12">
+      <div class="washi-tape-top" style="background: rgba(129, 199, 132, 0.8);"></div>
+      <div class="month-tab-badge" style="background: #66BB6A;">♨️ 2025 . 12 ・ 冬日溫泉之旅 ☕</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2025_12.png" alt="2025年12月手帳" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800';" />
+        <div class="highlighter-hotspot hoverable" style="top: 41%; left: 4%; width: 48%; height: 3.8%;" data-target-pouch="pouch_2025_12">
+          <span class="hotspot-hint-bubble">♨️ 點開溫泉特輯</span>
+        </div>
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2025_12" data-target-pool="pool_2025_12">
+        <div class="pouch-count-pill" id="count_pool_2025_12">3</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2025_12">
+        <div class="transformable-polaroid" data-id="p_2025_12_1" data-default-x="20" data-default-y="70" style="top: 15%; left: 8%;">
+          <div class="draggable-tape" style="background: rgba(129, 199, 132, 0.8);"></div><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" alt="露天溫泉" /><div class="caption">暖呼呼露天溫泉 ♨️</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2025_12_2" data-default-x="230" data-default-y="210" style="top: 38%; right: 8%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=600" alt="溫泉住宿" /><div class="caption">溫泉旅館開箱 🏨</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2025_12_3" data-default-x="30" data-default-y="340" style="top: 60%; left: 14%;">
+          <div class="draggable-tape" style="background: rgba(255, 224, 130, 0.85);"></div><img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=600" alt="玩沐浴球" /><div class="caption">玩沐浴球泡泡超好笑 🫧</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 4: 2026.01 (800天) -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_01">
+      <div class="washi-tape-top" style="background: rgba(255, 224, 130, 0.9);"></div>
+      <div class="month-tab-badge" style="background: #FFA726;">💌 2026 . 01 ・ 800 天與新篇章 ⭐</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_01.png" alt="2026年1月手帳" onerror="this.src='https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=800';" />
+        <div class="highlighter-hotspot hoverable" style="top: 8%; left: 5%; width: 36%; height: 3.5%;" data-target-pouch="pouch_2026_01">
+          <span class="hotspot-hint-bubble">800天紀念💛</span>
+        </div>
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_01" data-target-pool="pool_2026_01">
+        <div class="pouch-count-pill" id="count_pool_2026_01">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_01">
+        <div class="transformable-polaroid" data-id="p_2026_01_1" data-default-x="30" data-default-y="120" style="top: 25%; left: 10%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600" alt="800天" /><div class="caption">800 天的陪伴 🐾</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_01_2" data-default-x="220" data-default-y="260" style="top: 50%; right: 10%;">
+          <div class="draggable-tape" style="background: rgba(255, 138, 128, 0.8);"></div><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600" alt="禮物" /><div class="caption">收到可愛的小禮物 🎁</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 5: 2026.02 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_02">
+      <div class="washi-tape-top" style="background: rgba(244, 143, 177, 0.8);"></div>
+      <div class="month-tab-badge" style="background: #EC407A;">🌱 2026 . 02 ・ 皮克敏與甜美日常 💌</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_02.png" alt="2026年2月手帳" onerror="this.src='https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_02" data-target-pool="pool_2026_02">
+        <div class="pouch-count-pill" id="count_pool_2026_02">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_02">
+        <div class="transformable-polaroid" data-id="p_2026_02_1" data-default-x="25" data-default-y="100" style="top: 20%; left: 8%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600" alt="2月" /><div class="caption">皮克敏明信片 🌱</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_02_2" data-default-x="230" data-default-y="240" style="top: 45%; right: 8%;">
+          <div class="draggable-tape" style="background: rgba(255, 224, 130, 0.85);"></div><img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600" alt="甜美日常" /><div class="caption">笑口常開的咪咪 💖</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 6: 2026.03 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_03">
+      <div class="washi-tape-top" style="background: rgba(178, 223, 219, 0.8);"></div>
+      <div class="month-tab-badge" style="background: #26A69A;">🌸 2026 . 03 ・ 初春微風相伴 🍃</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_03.png" alt="2026年3月手帳" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_03" data-target-pool="pool_2026_03">
+        <div class="pouch-count-pill" id="count_pool_2026_03">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_03">
+        <div class="transformable-polaroid" data-id="p_2026_03_1" data-default-x="30" data-default-y="100" style="top: 20%; left: 10%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" alt="春遊" /><div class="caption">春日散步時光 🌸</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_03_2" data-default-x="220" data-default-y="240" style="top: 48%; right: 10%;">
+          <div class="draggable-tape" style="background: rgba(255, 138, 128, 0.8);"></div><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600" alt="好心情" /><div class="caption">晴朗的好天氣 🌤️</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 7: 2026.04 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_04">
+      <div class="washi-tape-top" style="background: rgba(200, 230, 201, 0.85);"></div>
+      <div class="month-tab-badge" style="background: #4CAF50;">🌿 2026 . 04 ・ 綠意盎然的小旅行 🌳</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_04.png" alt="2026年4月手帳" onerror="this.src='https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_04" data-target-pool="pool_2026_04">
+        <div class="pouch-count-pill" id="count_pool_2026_04">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_04">
+        <div class="transformable-polaroid" data-id="p_2026_04_1" data-default-x="25" data-default-y="90" style="top: 18%; left: 8%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600" alt="4月" /><div class="caption">綠油油的草皮 🍀</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_04_2" data-default-x="230" data-default-y="230" style="top: 45%; right: 8%;">
+          <div class="draggable-tape" style="background: rgba(255, 213, 79, 0.85);"></div><img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600" alt="日常" /><div class="caption">大快朵頤吃美食 🍰</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 8: 2026.05 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_05">
+      <div class="washi-tape-top" style="background: rgba(255, 236, 179, 0.9);"></div>
+      <div class="month-tab-badge" style="background: #FFB300;">☀️ 2026 . 05 ・ 初夏微風冒險 🌻</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_05.png" alt="2026年5月手帳" onerror="this.src='https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_05" data-target-pool="pool_2026_05">
+        <div class="pouch-count-pill" id="count_pool_2026_05">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_05">
+        <div class="transformable-polaroid" data-id="p_2026_05_1" data-default-x="30" data-default-y="100" style="top: 20%; left: 10%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600" alt="5月" /><div class="caption">初夏的藍天 🌤️</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_05_2" data-default-x="220" data-default-y="250" style="top: 48%; right: 10%;">
+          <div class="draggable-tape" style="background: rgba(129, 199, 132, 0.8);"></div><img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600" alt="出遊" /><div class="caption">充滿笑聲的一天 🎈</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 9: 2026.06 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_06">
+      <div class="washi-tape-top" style="background: rgba(179, 229, 252, 0.85);"></div>
+      <div class="month-tab-badge" style="background: #03A9F4;">🍉 2026 . 06 ・ 盛夏的歡笑與冰品 🍧</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_06.png" alt="2026年6月手帳" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_06" data-target-pool="pool_2026_06">
+        <div class="pouch-count-pill" id="count_pool_2026_06">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_06">
+        <div class="transformable-polaroid" data-id="p_2026_06_1" data-default-x="25" data-default-y="90" style="top: 18%; left: 8%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600" alt="6月" /><div class="caption">冰涼美味的點心 🍧</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_06_2" data-default-x="230" data-default-y="230" style="top: 45%; right: 8%;">
+          <div class="draggable-tape" style="background: rgba(255, 138, 128, 0.8);"></div><img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600" alt="夏日" /><div class="caption">夏天也要大口吃冰 🍉</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 10: 2026.07 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_07">
+      <div class="washi-tape-top" style="background: rgba(255, 204, 188, 0.85);"></div>
+      <div class="month-tab-badge" style="background: #FF7043;">🌊 2026 . 07 ・ 陽光與海風之約 🏖️</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_07.png" alt="2026年7月手帳" onerror="this.src='https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_07" data-target-pool="pool_2026_07">
+        <div class="pouch-count-pill" id="count_pool_2026_07">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_07">
+        <div class="transformable-polaroid" data-id="p_2026_07_1" data-default-x="30" data-default-y="100" style="top: 20%; left: 10%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600" alt="7月" /><div class="caption">聽海浪唱歌 🌊</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_07_2" data-default-x="220" data-default-y="250" style="top: 48%; right: 10%;">
+          <div class="draggable-tape" style="background: rgba(255, 224, 130, 0.85);"></div><img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600" alt="看海" /><div class="caption">吹著海風看夕陽 🌅</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 11: 2026.08 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_08">
+      <div class="washi-tape-top" style="background: rgba(209, 196, 233, 0.85);"></div>
+      <div class="month-tab-badge" style="background: #7E57C2;">🎆 2026 . 08 ・ 夏末煙火與晚風 ✨</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_08.png" alt="2026年8月手帳" onerror="this.src='https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_08" data-target-pool="pool_2026_08">
+        <div class="pouch-count-pill" id="count_pool_2026_08">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_08">
+        <div class="transformable-polaroid" data-id="p_2026_08_1" data-default-x="25" data-default-y="90" style="top: 18%; left: 8%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600" alt="8月" /><div class="caption">閃亮的夜空 ✨</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_08_2" data-default-x="230" data-default-y="230" style="top: 45%; right: 8%;">
+          <div class="draggable-tape" style="background: rgba(255, 138, 128, 0.8);"></div><img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600" alt="晚風" /><div class="caption">牽著手看星星 🌌</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 月份 12: 2026.09 -->
+    <div class="monthly-paper-card hoverable" id="monthCard_2026_09">
+      <div class="washi-tape-top" style="background: rgba(255, 205, 210, 0.85);"></div>
+      <div class="month-tab-badge" style="background: #E91E63;">🎂 2026 . 09 ・ 生日前夕倒數時光 🎁</div>
+      <div class="goodnotes-sheet-wrapper">
+        <img class="goodnotes-sheet-img" src="images/month_2026_09.png" alt="2026年9月手帳" onerror="this.src='https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=800';" />
+      </div>
+      <div class="fukubukuro-pouch hoverable" id="pouch_2026_09" data-target-pool="pool_2026_09">
+        <div class="pouch-count-pill" id="count_pool_2026_09">2</div>
+        <div class="pouch-ruffle"></div><div class="pouch-ribbon"></div><div class="pouch-body"></div>
+      </div>
+      <div class="draggable-photo-pool" id="pool_2026_09">
+        <div class="transformable-polaroid" data-id="p_2026_09_1" data-default-x="30" data-default-y="100" style="top: 20%; left: 10%;">
+          <div class="draggable-tape"></div><img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=600" alt="9月" /><div class="caption">滿滿一整年的愛 💖</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+        <div class="transformable-polaroid" data-id="p_2026_09_2" data-default-x="220" data-default-y="250" style="top: 48%; right: 10%;">
+          <div class="draggable-tape" style="background: rgba(255, 224, 130, 0.85);"></div><img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=600" alt="祝咪生日快樂" /><div class="caption">24歲生日大快樂！🎂</div>
+          <div class="transform-gizmo"><div class="rot-stem"></div><div class="rot-handle">⟳</div><div class="scale-handle handle-br"></div><div class="scale-handle handle-bl"></div><div class="scale-handle handle-tr"></div><div class="scale-handle handle-tl"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="celebrate-btn hoverable" id="celebrateBtn">點擊吹蠟燭：咪咪生日快樂！🎂</button>
+  </main>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger, Draggable);
+
+    const envelope = document.getElementById('envelope');
+    const envelopeScene = document.getElementById('envelopeScene');
+    const envelopeScreen = document.getElementById('envelopeScreen');
+    const mainContent = document.getElementById('mainContent');
+    const celebrateBtn = document.getElementById('celebrateBtn');
+    const monthlyCards = document.querySelectorAll('.monthly-paper-card');
+
+    const cursorDot = document.getElementById('cursorDot');
+    const cursorButt = document.getElementById('cursorButtFollower');
+
+    const playToggleBtn = document.getElementById('playToggleBtn');
+    const muteToggleBtn = document.getElementById('muteToggleBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+
+    let isOpen = false;
+    let player = null;
+    let isPlayerReady = false;
+    let shouldAutoPlayOnReady = false;
+    let highestZ = 100;
+    let activeSelectedPhoto = null;
+
+    // 本地持久化資料庫 Key
+    const STORAGE_KEY = 'purin_birthday_scrapbook_state_v2';
+
+    // 1. 屁屁游標跟隨
+    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let buttPos = { x: mouse.x, y: mouse.y };
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+      cursorDot.style.left = `${mouse.x}px`;
+      cursorDot.style.top = `${mouse.y}px`;
+    });
+
+    gsap.ticker.add(() => {
+      buttPos.x += (mouse.x - buttPos.x) * 0.16;
+      buttPos.y += (mouse.y - buttPos.y) * 0.16;
+      cursorButt.style.left = `${buttPos.x}px`;
+      cursorButt.style.top = `${buttPos.y}px`;
+    });
+
+    document.querySelectorAll('.hoverable').forEach(el => {
+      el.addEventListener('mouseenter', () => cursorButt.classList.add('hovered'));
+      el.addEventListener('mouseleave', () => cursorButt.classList.remove('hovered'));
+    });
+
+    // 2. 3D 信封視差
+    const xTo = gsap.quickTo(envelopeScene, "rotationY", { duration: 0.6, ease: "power2.out" });
+    const yTo = gsap.quickTo(envelopeScene, "rotationX", { duration: 0.6, ease: "power2.out" });
+
+    window.addEventListener('mousemove', (e) => {
+      if (isOpen) return;
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      xTo(((e.clientX - cx) / cx) * 16);
+      yTo(-((e.clientY - cy) / cy) * 14);
+    });
+
+    // 3. YouTube 播放器
+    window.onYouTubeIframeAPIReady = function() {
+      player = new YT.Player('ytPlayer', {
+        height: '100%', width: '100%', videoId: 'gY5TgD-yRPI',
+        playerVars: { 'autoplay': 0, 'controls': 0, 'loop': 1, 'playlist': 'gY5TgD-yRPI', 'playsinline': 1, 'enablejsapi': 1 },
+        events: {
+          'onReady': () => {
+            isPlayerReady = true; player.setVolume(volumeSlider.value);
+            if (shouldAutoPlayOnReady) startPlayMusic();
+          },
+          'onStateChange': (e) => {
+            if (e.data === YT.PlayerState.PLAYING) playToggleBtn.classList.add('playing');
+            else playToggleBtn.classList.remove('playing');
+          }
+        }
+      });
+    };
+
+    function startPlayMusic() {
+      if (isPlayerReady && player) {
+        player.unMute(); player.playVideo();
+        playToggleBtn.classList.add('playing'); muteToggleBtn.textContent = '🔊';
+      } else { shouldAutoPlayOnReady = true; }
+    }
+
+    function pauseMusic() {
+      if (isPlayerReady && player) { player.pauseVideo(); playToggleBtn.classList.remove('playing'); }
+    }
+
+    playToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isPlayerReady || !player) { startPlayMusic(); return; }
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) pauseMusic();
+      else startPlayMusic();
+    });
+
+    muteToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isPlayerReady || !player) return;
+      if (player.isMuted()) { player.unMute(); muteToggleBtn.textContent = '🔊'; volumeSlider.value = player.getVolume() || 75; }
+      else { player.mute(); muteToggleBtn.textContent = '🔇'; }
+    });
+
+    volumeSlider.addEventListener('input', (e) => {
+      const vol = parseInt(e.target.value, 10);
+      if (isPlayerReady && player) {
+        if (vol === 0) { player.mute(); muteToggleBtn.textContent = '🔇'; }
+        else { if (player.isMuted()) player.unMute(); player.setVolume(vol); muteToggleBtn.textContent = '🔊'; }
+      }
+    });
+
+    // 4. 拆信封開啟
+    envelope.addEventListener('click', () => {
+      if (isOpen) return;
+      isOpen = true;
+
+      gsap.to(envelopeScene, { rotationX: 0, rotationY: 0, duration: 0.4 });
+      envelope.classList.add('open');
+      
+      confetti({
+        particleCount: 80, spread: 80, origin: { y: 0.6 },
+        colors: ['#FFD54F', '#FFA000', '#5C3D28', '#FFFFFF']
+      });
+
+      startPlayMusic();
+
+      setTimeout(() => {
+        mainContent.style.display = 'block';
+        gsap.to(mainContent, {
+          opacity: 1, duration: 0.9,
+          onComplete: () => {
+            envelopeScreen.style.display = 'none';
+            initMonthlyCardScrollAnimations();
+            initScrapbookPersistentSystem();
+          }
+        });
+      }, 950);
+    });
+
+    // 5. 每個月信紙滾動翻開
+    function initMonthlyCardScrollAnimations() {
+      monthlyCards.forEach((card, index) => {
+        const randomAngle = (index % 2 === 0 ? -1.6 : 1.6);
+        gsap.to(card, {
+          scrollTrigger: { trigger: card, start: "top 82%", toggleActions: "play none none reverse" },
+          opacity: 1, y: 0, scale: 1, rotation: randomAngle, duration: 0.9, ease: "back.out(1.4)"
+        });
+      });
+    }
+
+    // ================= 6. 核心亮點：永久記憶庫 (LocalStorage) + 無限縮放/旋轉 =================
+    function initScrapbookPersistentSystem() {
+      // 讀取本地已保存的狀態
+      let savedState = {};
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) savedState = JSON.parse(raw);
+      } catch (err) {
+        savedState = {};
+      }
+
+      function savePhotoState(id, data) {
+        if (!savedState[id]) savedState[id] = {};
+        Object.assign(savedState[id], data);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(savedState));
+        } catch (e) {}
+      }
+
+      const pouches = document.querySelectorAll('.fukubukuro-pouch');
+
+      function updatePouchCount(poolId) {
+        const pool = document.getElementById(poolId);
+        const countPill = document.getElementById(`count_${poolId}`);
+        const activePhotos = Array.from(pool.querySelectorAll('.transformable-polaroid')).filter(p => p.style.display !== 'none');
+        const remaining = pool.querySelectorAll('.transformable-polaroid').length - activePhotos.length;
+        countPill.textContent = remaining;
+      }
+
+      function deselectAll() {
+        if (activeSelectedPhoto) {
+          activeSelectedPhoto.classList.remove('selected');
+          activeSelectedPhoto = null;
+        }
+      }
+      document.addEventListener('pointerdown', (e) => {
+        if (!e.target.closest('.transformable-polaroid')) deselectAll();
+      });
+
+      // 彈出指定袋子裡的照片 (以彈簧動態恢復到記憶位置)
+      function popOutPhotos(pouch, poolId) {
+        const pool = document.getElementById(poolId);
+        const photos = pool.querySelectorAll('.transformable-polaroid');
+
+        gsap.fromTo(pouch, { scale: 0.8 }, { scale: 1.25, rotation: -8, yoyo: true, repeat: 1, duration: 0.22 });
+
+        const rect = pouch.getBoundingClientRect();
+        confetti({
+          particleCount: 18, spread: 60,
+          origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: rect.top / window.innerHeight }
+        });
+
+        photos.forEach((photo, i) => {
+          photo.style.display = 'block';
+          const photoId = photo.getAttribute('data-id');
+          const pData = savedState[photoId] || {};
+
+          const targetX = pData.x !== undefined ? pData.x : 0;
+          const targetY = pData.y !== undefined ? pData.y : 0;
+          const targetRot = pData.rot !== undefined ? pData.rot : (Math.random() - 0.5) * 14;
+
+          savePhotoState(photoId, { inPouch: false, x: targetX, y: targetY, rot: targetRot });
+
+          gsap.fromTo(photo,
+            { scale: 0.1, opacity: 0, x: pouch.offsetLeft - photo.offsetLeft, y: pouch.offsetTop - photo.offsetTop },
+            { scale: 1, opacity: 1, x: targetX, y: targetY, rotation: targetRot, duration: 0.65, delay: i * 0.12, ease: "back.out(1.7)" }
+          );
+        });
+
+        setTimeout(() => updatePouchCount(poolId), 100);
+      }
+
+      // 收回所有照片
+      function suckBackAllPhotos(pouch, poolId) {
+        const pool = document.getElementById(poolId);
+        const photos = pool.querySelectorAll('.transformable-polaroid');
+        deselectAll();
+
+        photos.forEach((photo) => {
+          const photoId = photo.getAttribute('data-id');
+          savePhotoState(photoId, { inPouch: true });
+        });
+
+        gsap.to(photos, {
+          scale: 0.1, opacity: 0,
+          x: pouch.offsetLeft - pool.offsetLeft,
+          y: pouch.offsetTop - pool.offsetTop,
+          duration: 0.4, stagger: 0.08, ease: "power2.in",
+          onComplete: () => {
+            photos.forEach(p => p.style.display = 'none');
+            updatePouchCount(poolId);
+          }
+        });
+
+        gsap.fromTo(pouch, { scale: 1.3 }, { scale: 1, duration: 0.35, ease: "elastic.out(1, 0.4)" });
+      }
+
+      // 綁定福袋點擊
+      pouches.forEach(pouch => {
+        const poolId = pouch.getAttribute('data-target-pool');
+        pouch.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const pool = document.getElementById(poolId);
+          const hiddenPhotos = Array.from(pool.querySelectorAll('.transformable-polaroid')).filter(p => p.style.display === 'none');
+          if (hiddenPhotos.length > 0) popOutPhotos(pouch, poolId);
+          else suckBackAllPhotos(pouch, poolId);
+        });
+      });
+
+      // 綁定手寫信螢光筆熱區
+      document.querySelectorAll('.highlighter-hotspot').forEach(hotspot => {
+        hotspot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const targetPouchId = hotspot.getAttribute('data-target-pouch');
+          const pouch = document.getElementById(targetPouchId);
+          const poolId = pouch.getAttribute('data-target-pool');
+          popOutPhotos(pouch, poolId);
+        });
+      });
+
+      // 初始化每一張照片 (恢復記憶、無限縮放、任意旋轉、拖曳)
+      document.querySelectorAll('.transformable-polaroid').forEach(photo => {
+        const photoId = photo.getAttribute('data-id');
+        const pool = photo.closest('.draggable-photo-pool');
+        const poolId = pool.id;
+        const card = photo.closest('.monthly-paper-card');
+        const pouch = card.querySelector('.fukubukuro-pouch');
+
+        // 讀取該照片過去的自訂記憶 (位置、角度、大小、是否在袋內)
+        const pData = savedState[photoId];
+        if (pData) {
+          if (pData.width) photo.style.width = `${pData.width}px`;
+          if (pData.x !== undefined && pData.y !== undefined) {
+            gsap.set(photo, { x: pData.x, y: pData.y });
+          }
+          if (pData.rot !== undefined) {
+            gsap.set(photo, { rotation: pData.rot });
+          }
+          if (pData.inPouch === false) {
+            photo.style.display = 'block';
+          } else {
+            photo.style.display = 'none';
+          }
+        }
+
+        // 選取啟動
+        photo.addEventListener('pointerdown', (e) => {
+          if (e.target.classList.contains('rot-handle') || e.target.classList.contains('scale-handle')) return;
+          deselectAll();
+          photo.classList.add('selected');
+          activeSelectedPhoto = photo;
+          photo.style.zIndex = ++highestZ;
+        });
+
+        // 頂部旋轉桿 ⟳ (360° 任意角度並永久保存)
+        const rotHandle = photo.querySelector('.rot-handle');
+        if (rotHandle) {
+          rotHandle.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            rotHandle.setPointerCapture(e.pointerId);
+
+            const rect = photo.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            function onRotateMove(ev) {
+              const rad = Math.atan2(ev.clientY - centerY, ev.clientX - centerX);
+              const deg = rad * (180 / Math.PI) + 90;
+              gsap.set(photo, { rotation: deg });
+              savePhotoState(photoId, { rot: deg });
+            }
+
+            function onRotateEnd(ev) {
+              rotHandle.releasePointerCapture(ev.pointerId);
+              window.removeEventListener('pointermove', onRotateMove);
+              window.removeEventListener('pointerup', onRotateEnd);
+            }
+
+            window.addEventListener('pointermove', onRotateMove);
+            window.addEventListener('pointerup', onRotateEnd);
+          });
+        }
+
+        // 四角縮放節點 ● (完全無限制！拉多大縮多小都可以，並永久保存)
+        photo.querySelectorAll('.scale-handle').forEach(scaleHandle => {
+          scaleHandle.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+            scaleHandle.setPointerCapture(e.pointerId);
+
+            const startX = e.clientX;
+            const startW = photo.offsetWidth;
+            const isRightHandle = scaleHandle.classList.contains('handle-br') || scaleHandle.classList.contains('handle-tr');
+
+            function onScaleMove(ev) {
+              const deltaX = (ev.clientX - startX) * (isRightHandle ? 1 : -1);
+              // 僅設 30px 防止倒翻，無任何最大上限限制！
+              const newW = Math.max(30, startW + deltaX);
+              photo.style.width = `${newW}px`;
+              savePhotoState(photoId, { width: newW });
+            }
+
+            function onScaleEnd(ev) {
+              scaleHandle.releasePointerCapture(ev.pointerId);
+              window.removeEventListener('pointermove', onScaleMove);
+              window.removeEventListener('pointerup', onScaleEnd);
+            }
+
+            window.addEventListener('pointermove', onScaleMove);
+            window.addEventListener('pointerup', onScaleEnd);
+          });
+        });
+
+        // 拖曳本體與拖進福袋判定
+        Draggable.create(photo, {
+          type: "x,y",
+          edgeResistance: 0.65,
+          trigger: photo,
+          onPress: function(e) {
+            if (e.target.classList.contains('rot-handle') || e.target.classList.contains('scale-handle')) {
+              this.endDrag(e);
+            }
+          },
+          onDrag: function() {
+            if (this.hitTest(pouch, "25%")) pouch.classList.add('drop-hover');
+            else pouch.classList.remove('drop-hover');
+          },
+          onDragEnd: function() {
+            pouch.classList.remove('drop-hover');
+
+            // 拖到福袋上方放手 ➔ 吸入福袋
+            if (this.hitTest(pouch, "25%")) {
+              deselectAll();
+              savePhotoState(photoId, { inPouch: true });
+
+              gsap.to(this.target, {
+                x: pouch.offsetLeft - this.target.offsetLeft + 10,
+                y: pouch.offsetTop - this.target.offsetTop + 10,
+                scale: 0.1,
+                opacity: 0,
+                duration: 0.35,
+                ease: "back.in(1.8)",
+                onComplete: () => {
+                  this.target.style.display = 'none';
+                  // 恢復回原本記憶的 x, y，供下次拿出時依然在自訂位置！
+                  const pD = savedState[photoId] || {};
+                  gsap.set(this.target, { x: pD.x || 0, y: pD.y || 0, scale: 1 });
+                  updatePouchCount(poolId);
+                }
+              });
+
+              gsap.fromTo(pouch, { scale: 1.35 }, { scale: 1, duration: 0.4, ease: "elastic.out(1, 0.4)" });
+            } else {
+              // 留在紙面上 ➔ 永久記住放手時的 (x, y) 座標！
+              savePhotoState(photoId, { x: this.x, y: this.y, inPouch: false });
+            }
+          }
+        });
+      });
+
+      // 初始化所有福袋的計數器
+      pouches.forEach(pouch => {
+        updatePouchCount(pouch.getAttribute('data-target-pool'));
+      });
+    }
+
+    celebrateBtn.addEventListener('click', () => {
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.7 }, colors: ['#FFD54F', '#FFA000', '#5C3D28', '#FF8A80'] });
+    });
+  </script>
+</body>
+</html>
