@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --purin-yellow: #FED458;
+    --purin-light-yellow: #FFF9E6;
+    --purin-cream: #FFFDF4;
+    --purin-brown: #4A3319;
+    --purin-brown-deep: #382410;
+    --purin-caramel: #E68A00;
+    --card-border: #E8D9C5;
+    --washi-alpha: rgba(254, 212, 88, 0.85);
+  }
+
+  body {
+    background-color: var(--purin-cream);
+    color: var(--purin-brown);
+    font-family: 'Zen Maru Gothic', 'Plus Jakarta Sans', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* 宣紙/棉紙細緻紋理底圖 */
+.paper-texture-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(rgba(230, 138, 0, 0.08) 1px, transparent 1px),
+    radial-gradient(rgba(74, 51, 25, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px, 12px 12px;
+  background-position: 0 0, 6px 6px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 細緻、不擋眼的布丁狗屁屁米字 (＊) 游標 */
+@media (pointer: fine) {
+  .custom-cursor-dot {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background-color: #5C3D28;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease;
+  }
+
+  .custom-cursor-follower {
+    position: fixed;
+    width: 28px;
+    height: 28px;
+    background-color: rgba(255, 230, 138, 0.88);
+    backdrop-filter: blur(2px);
+    border: 1.5px solid #5C3D28;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(92, 61, 40, 0.15);
+    transition: width 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                height 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-color 0.2s ease,
+                background-color 0.2s ease;
+  }
+
+  .cursor-tail {
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 6px;
+    background-color: #FFE082;
+    border: 1.5px solid #5C3D28;
+    border-bottom: none;
+    border-radius: 3px 3px 0 0;
+  }
+
+  .cursor-star {
+    font-size: 14px;
+    font-weight: 900;
+    color: #5C3D28;
+    line-height: 1;
+    user-select: none;
+    font-family: 'Zen Maru Gothic', sans-serif;
+  }
+
+  .custom-cursor-follower.hovered {
+    width: 34px;
+    height: 34px;
+    background-color: rgba(254, 212, 88, 0.95);
+    border-color: #382410;
+    box-shadow: 0 4px 14px rgba(230, 138, 0, 0.28);
+    animation: gentleButtWiggle 0.6s infinite ease-in-out alternate;
+  }
+
+  @keyframes gentleButtWiggle {
+    0% { transform: translate(-50%, -50%) rotate(-8deg) scale(1.05); }
+    100% { transform: translate(-50%, -50%) rotate(8deg) scale(1.05); }
+  }
+}
+
+/* 紙膠帶紋理 */
+.washi-tape {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(254, 212, 88, 0.75),
+    rgba(254, 212, 88, 0.75) 6px,
+    rgba(255, 235, 150, 0.85) 6px,
+    rgba(255, 235, 150, 0.85) 12px
+  );
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  mask-image: radial-gradient(circle at 0% 50%, transparent 2px, black 3px),
+              radial-gradient(circle at 100% 50%, transparent 2px, black 3px);
+}
+
+.washi-tape-coral {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(240, 140, 125, 0.75),
+    rgba(240, 140, 125, 0.75) 6px,
+    rgba(250, 175, 160, 0.85) 6px,
+    rgba(250, 175, 160, 0.85) 12px
+  );
+}
+
+.washi-tape-mint {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(140, 195, 150, 0.75),
+    rgba(140, 195, 150, 0.75) 6px,
+    rgba(175, 215, 180, 0.85) 6px,
+    rgba(175, 215, 180, 0.85) 12px
+  );
+}
+
+/* 賀卡手撕邊緣與立體折疊陰影 */
+.greeting-card-deck {
+  background: #FFFFFF;
+  background-image: 
+    radial-gradient(rgba(74, 51, 25, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+  border: 2px solid #EAE0D3;
+  border-radius: 20px;
+  box-shadow: 
+    0 12px 36px -4px rgba(74, 51, 25, 0.08),
+    0 2px 6px rgba(74, 51, 25, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.greeting-card-deck:hover {
+  box-shadow: 
+    0 18px 45px -4px rgba(74, 51, 25, 0.12),
+    0 4px 10px rgba(74, 51, 25, 0.06);
+}
+
+/* 實體信封翻摺樣式 */
+.envelope-flap-polygon {
+  clip-path: polygon(0 0, 100% 0, 50% 52%);
+}
+
+.envelope-pocket-polygon {
+  clip-path: polygon(0% 100%, 50% 50%, 100% 100%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.envelope-pocket-sides-polygon {
+  clip-path: polygon(0 0, 0% 100%, 100% 100%, 100% 0, 50% 50%);
+}
+
+/* 拍立得相框 */
+.polaroid-frame {
+  background: #FFFFFF;
+  border-radius: 4px;
+  box-shadow: 
+    0 10px 25px -3px rgba(56, 36, 16, 0.16),
+    0 4px 8px -2px rgba(56, 36, 16, 0.08);
+  border: 1px solid #ECE4DA;
+  user-select: none;
+  transition: box-shadow 0.2s ease;
+}
+
+.polaroid-frame.is-selected {
+  box-shadow: 
+    0 0 0 2px #E68A00,
+    0 16px 36px -4px rgba(56, 36, 16, 0.25);
+}
+
+/* 復古郵戳與打凸章 */
+.embossed-seal {
+  background: radial-gradient(circle at 35% 35%, #F4B942, #D88918);
+  box-shadow: 
+    0 4px 10px rgba(74, 51, 25, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
