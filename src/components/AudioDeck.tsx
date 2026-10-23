@@ -175,7 +175,7 @@ export const AudioDeck: React.FC<AudioDeckProps> = ({ shouldPlay = false }) => {
         <div className="hidden sm:flex flex-col text-left">
           <span className="text-[11px] font-bold text-[#4A3319] leading-tight flex items-center gap-1">
             <BeretIcon size={12} className="text-[#4A3319]" />
-            咪的生日旋律
+            🍮布丁狗駐唱！
           </span>
           <span className="text-[9px] text-[#8C6D4F] leading-tight font-sans">
             {isPlaying ? '播放中 ♬' : '已暫停'}

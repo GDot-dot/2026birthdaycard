@@ -111,12 +111,12 @@ export default function App() {
             </div>
 
             <h1 className="font-['Caveat'] text-5xl sm:text-6xl md:text-7xl font-bold text-[#4A3319] leading-tight mb-2">
-              寶貝咪 24 歲生日月記
+              寶貝咪 24 歲生日卡片
             </h1>
 
             <p className="text-sm sm:text-base font-bold text-[#8C6D4F] max-w-lg mx-auto flex items-center justify-center gap-1.5 mt-2">
               <Sparkles className="w-4 h-4 text-[#E68A00]" />
-              收集這一年份的歡笑、溫暖與點滴心動
+              回顧2025一年份的歡笑、溫暖與經歷！
               <Sparkles className="w-4 h-4 text-[#E68A00]" />
             </p>
           </header>
