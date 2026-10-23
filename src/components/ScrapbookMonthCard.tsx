@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import gsap from 'gsap';
 import confetti from 'canvas-confetti';
-import { MonthData, PhotoState } from '../types';
+import { MonthData, PhotoItem, PhotoState } from '../types';
 import { TransformablePolaroid, PolaroidHandle } from './TransformablePolaroid';
 import { FukubukuroIcon, PostalStampMark, PawPrintIcon } from './DecorativeOrnaments';
 
@@ -11,6 +11,16 @@ interface ScrapbookMonthCardProps {
   onUpdatePhotoState: (id: string, updates: Partial<PhotoState>) => void;
   onBatchUpdatePhotoState: (updates: Record<string, Partial<PhotoState>>) => void;
 }
+
+// 核心安全函數：為每張照片取得絕對唯一的獨立識別碼，避免同 group 照片共享縮放或旋轉
+export const getPhotoUniqueId = (photo: PhotoItem, index: number, allPhotos: PhotoItem[]): string => {
+  const duplicateCount = allPhotos.filter((p) => p.id === photo.id).length;
+  // 若未填 id、或誤將 groupId 當成 id、或照片 id 有重複，自動以索引後綴隔離
+  if (!photo.id || photo.id === photo.groupId || duplicateCount > 1) {
+    return `${photo.id || photo.groupId || 'photo'}_u${index}`;
+  }
+  return photo.id;
+};
 
 export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
   month,
@@ -34,8 +44,9 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
   };
 
   // 計算袋內照片數量
-  const hiddenCount = month.photos.filter((p) => {
-    const s = photoStates[p.id];
+  const hiddenCount = month.photos.filter((p, idx) => {
+    const uid = getPhotoUniqueId(p, idx, month.photos);
+    const s = photoStates[uid] || photoStates[p.id];
     return !s || s.inPouch !== false;
   }).length;
 
@@ -52,11 +63,13 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
     );
 
     photosToFly.forEach((photo, i) => {
-      const handle = photoRefs.current[photo.id];
+      const photoIndex = month.photos.indexOf(photo);
+      const uid = getPhotoUniqueId(photo, photoIndex >= 0 ? photoIndex : i, month.photos);
+      const handle = photoRefs.current[uid];
       const photoEl = handle?.getElement();
       if (!photoEl) return;
 
-      const pState = photoStates[photo.id] || {};
+      const pState = photoStates[uid] || photoStates[photo.id] || {};
       const targetX = pState.x || 0;
       const targetY = pState.y || 0;
       const targetRot = pState.rot !== undefined ? pState.rot : photo.defaultPosition.rotateDeg || 0;
@@ -65,7 +78,7 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
       photoEl.style.display = 'block';
       const delta = getPouchDelta(photoEl, pouch);
 
-      onUpdatePhotoState(photo.id, { inPouch: false, x: targetX, y: targetY, rot: targetRot });
+      onUpdatePhotoState(uid, { inPouch: false, x: targetX, y: targetY, rot: targetRot });
 
       gsap.fromTo(
         photoEl,
@@ -97,11 +110,13 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
     setSelectedPhotoId(null);
 
     photosToSuck.forEach((photo, i) => {
-      const handle = photoRefs.current[photo.id];
+      const photoIndex = month.photos.indexOf(photo);
+      const uid = getPhotoUniqueId(photo, photoIndex >= 0 ? photoIndex : i, month.photos);
+      const handle = photoRefs.current[uid];
       const photoEl = handle?.getElement();
       if (!photoEl || photoEl.style.display === 'none') return;
 
-      const pState = photoStates[photo.id] || {};
+      const pState = photoStates[uid] || photoStates[photo.id] || {};
       const currentX = pState.x || 0;
       const currentY = pState.y || 0;
       const delta = getPouchDelta(photoEl, pouch);
@@ -117,7 +132,7 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
         onComplete: () => {
           photoEl.style.display = 'none';
           gsap.set(photoEl, { x: currentX, y: currentY, scale: 1, opacity: 1 });
-          onUpdatePhotoState(photo.id, { inPouch: true });
+          onUpdatePhotoState(uid, { inPouch: true });
         }
       });
     });
@@ -151,7 +166,9 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
 
     // 檢查該群組是否已全數在外面
     const allAreOut = groupPhotos.every((p) => {
-      const s = photoStates[p.id];
+      const photoIndex = month.photos.indexOf(p);
+      const uid = getPhotoUniqueId(p, photoIndex, month.photos);
+      const s = photoStates[uid] || photoStates[p.id];
       return s && s.inPouch === false;
     });
 
@@ -165,8 +182,9 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
   // 點擊福袋：一鍵全拿或全收
   const handlePouchClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const hiddenPhotos = month.photos.filter((p) => {
-      const s = photoStates[p.id];
+    const hiddenPhotos = month.photos.filter((p, idx) => {
+      const uid = getPhotoUniqueId(p, idx, month.photos);
+      const s = photoStates[uid] || photoStates[p.id];
       return !s || s.inPouch !== false;
     });
 
@@ -196,7 +214,10 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
   // 拖曳結束：若落在福袋上則吸入
   const handleDragEnd = (el: HTMLDivElement) => {
     if (isDropHover && selectedPhotoId && pouchRef.current) {
-      const photo = month.photos.find((p) => p.id === selectedPhotoId);
+      const photo = month.photos.find((p, idx) => {
+        const uid = getPhotoUniqueId(p, idx, month.photos);
+        return uid === selectedPhotoId || p.id === selectedPhotoId;
+      });
       if (photo) {
         animateSuckBack([photo]);
       }
@@ -255,10 +276,14 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
                   : [];
                 const isGroupOut =
                   groupPhotos.length > 0 &&
-                  groupPhotos.every((p) => photoStates[p.id]?.inPouch === false);
+                  groupPhotos.every((p) => {
+                    const photoIndex = month.photos.indexOf(p);
+                    const uid = getPhotoUniqueId(p, photoIndex, month.photos);
+                    return photoStates[uid]?.inPouch === false;
+                  });
 
                 return (
-                  <p key={i} className="text-justify">
+                  <p key={i} className="text-left leading-[2.2] break-words">
                     {frag.textBefore}
                     {frag.triggerWord && (
                       <button
@@ -302,30 +327,34 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
             </div>
           )}
 
-          {/* 拍立得照片群組 */}
-          {month.photos.map((photo) => (
-            <TransformablePolaroid
-              key={photo.id}
-              ref={(el) => {
-                photoRefs.current[photo.id] = el;
-              }}
-              photo={photo}
-              state={
-                photoStates[photo.id] || {
-                  x: 0,
-                  y: 0,
-                  rot: photo.defaultPosition.rotateDeg || 0,
-                  width: 210,
-                  inPouch: true
-                }
-              }
-              isSelected={selectedPhotoId === photo.id}
-              onSelect={() => setSelectedPhotoId(photo.id)}
-              onUpdateState={onUpdatePhotoState}
-              onDragMove={handleDragMove}
-              onDragEnd={handleDragEnd}
-            />
-          ))}
+          {/* 拍立得照片群組：每張相片皆具備獨立 uid，大小、旋轉、拖曳完全各自獨立 */}
+          {month.photos.map((photo, index) => {
+            const uid = getPhotoUniqueId(photo, index, month.photos);
+            const pState = photoStates[uid] || photoStates[photo.id] || {
+              x: 0,
+              y: 0,
+              rot: photo.defaultPosition.rotateDeg || 0,
+              width: 210,
+              inPouch: true
+            };
+
+            return (
+              <TransformablePolaroid
+                key={uid}
+                uniqueId={uid}
+                ref={(el) => {
+                  photoRefs.current[uid] = el;
+                }}
+                photo={photo}
+                state={pState}
+                isSelected={selectedPhotoId === uid}
+                onSelect={() => setSelectedPhotoId(uid)}
+                onUpdateState={onUpdatePhotoState}
+                onDragMove={handleDragMove}
+                onDragEnd={handleDragEnd}
+              />
+            );
+          })}
 
           {/* 右下角：和風布丁狗小福袋 */}
           <div

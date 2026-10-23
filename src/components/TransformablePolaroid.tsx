@@ -8,6 +8,7 @@ export interface PolaroidHandle {
 
 interface TransformablePolaroidProps {
   photo: PhotoItem;
+  uniqueId?: string;
   state: PhotoState;
   isSelected: boolean;
   onSelect: () => void;
@@ -20,6 +21,7 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
   (
     {
       photo,
+      uniqueId,
       state,
       isSelected,
       onSelect,
@@ -31,7 +33,33 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
   ) => {
     const polaroidRef = useRef<HTMLDivElement>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [imgError, setImgError] = useState(false);
+    const [imgSrc, setImgSrc] = useState(photo.src);
+    const [hasAttemptedFallback, setHasAttemptedFallback] = useState(false);
+
+    // 每一張照片使用專屬獨立 ID，確保縮放、拖曳與旋轉完全獨立
+    const actualId = uniqueId || photo.id;
+
+    useEffect(() => {
+      setImgSrc(photo.src);
+      setHasAttemptedFallback(false);
+    }, [photo.src]);
+
+    const handleImageError = () => {
+      if (!hasAttemptedFallback) {
+        if (photo.src.endsWith('.jpg')) {
+          setImgSrc(photo.src.replace('.jpg', '.JPG'));
+          setHasAttemptedFallback(true);
+        } else if (photo.src.endsWith('.JPG')) {
+          setImgSrc(photo.src.replace('.JPG', '.png'));
+          setHasAttemptedFallback(true);
+        } else {
+          setImgSrc(photo.fallbackSrc);
+          setHasAttemptedFallback(true);
+        }
+      } else {
+        setImgSrc(photo.fallbackSrc);
+      }
+    };
 
     useImperativeHandle(ref, () => ({
       getElement: () => polaroidRef.current
@@ -56,7 +84,7 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
         const newX = initialPosX + deltaX;
         const newY = initialPosY + deltaY;
 
-        onUpdateState(photo.id, { x: newX, y: newY });
+        onUpdateState(actualId, { x: newX, y: newY });
         if (polaroidRef.current && onDragMove) {
           onDragMove(ev, polaroidRef.current);
         }
@@ -75,7 +103,7 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
       window.addEventListener('pointerup', onPointerUp);
     };
 
-    // 處理 360° 旋轉
+    // 處理單張照片獨立 360° 旋轉
     const handleRotatePointerDown = (e: React.PointerEvent) => {
       e.stopPropagation();
       const polaroidEl = polaroidRef.current;
@@ -88,7 +116,7 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
       const onRotateMove = (ev: PointerEvent) => {
         const rad = Math.atan2(ev.clientY - centerY, ev.clientX - centerX);
         const deg = Math.round(rad * (180 / Math.PI) + 90);
-        onUpdateState(photo.id, { rot: deg });
+        onUpdateState(actualId, { rot: deg });
       };
 
       const onRotateUp = () => {
@@ -100,16 +128,22 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
       window.addEventListener('pointerup', onRotateUp);
     };
 
-    // 處理四角縮放
+    // 處理單張照片獨立四角縮放（不影響同 group 的其他照片）
     const handleScalePointerDown = (e: React.PointerEvent, isRight: boolean) => {
       e.stopPropagation();
       const startX = e.clientX;
-      const startWidth = state.width;
+      const polaroidEl = polaroidRef.current;
+      const startWidth = polaroidEl ? polaroidEl.offsetWidth : (state.width || 210);
 
       const onScaleMove = (ev: PointerEvent) => {
         const deltaX = (ev.clientX - startX) * (isRight ? 1 : -1);
-        const newWidth = Math.max(120, Math.min(420, startWidth + deltaX));
-        onUpdateState(photo.id, { width: newWidth });
+        const newWidth = Math.max(100, Math.min(600, Math.round(startWidth + deltaX)));
+
+        // 即時更新該照片實體寬度
+        if (polaroidEl) {
+          polaroidEl.style.width = `${newWidth}px`;
+        }
+        onUpdateState(actualId, { width: newWidth });
       };
 
       const onScaleUp = () => {
@@ -131,13 +165,13 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
     return (
       <div
         ref={polaroidRef}
-        data-id={photo.id}
+        data-id={actualId}
         data-group={photo.groupId}
         onPointerDown={handlePointerDown}
         style={{
           display: state.inPouch ? 'none' : 'block',
           transform: `translate3d(${state.x}px, ${state.y}px, 0) rotate(${state.rot}deg)`,
-          width: `${state.width}px`,
+          width: `${state.width || 210}px`,
           top: `${photo.defaultPosition.topPercent}%`,
           left: `${photo.defaultPosition.leftPercent}%`
         }}
@@ -150,13 +184,13 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
           className={`absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 ${tapeBgClass} rounded-sm shadow-sm pointer-events-none z-10`}
         />
 
-        {/* 照片圖片與圓角 */}
-        <div className="relative overflow-hidden rounded bg-[#F8F4EE] aspect-[4/3] flex items-center justify-center">
+        {/* 照片圖片與圓角：支援直式（手機直拍）與橫式自然比例 */}
+        <div className="relative overflow-hidden rounded bg-[#F8F4EE] flex items-center justify-center min-h-[140px] max-h-[75vh]">
           <img
-            src={imgError ? photo.fallbackSrc : photo.src}
+            src={imgSrc}
             alt={photo.caption}
-            onError={() => setImgError(true)}
-            className="w-full h-full object-cover pointer-events-none select-none transition-transform duration-300"
+            onError={handleImageError}
+            className="w-full h-auto max-h-[65vh] object-contain rounded-sm pointer-events-none select-none transition-transform duration-300"
             loading="lazy"
           />
         </div>
@@ -168,31 +202,31 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
           </p>
         </div>
 
-        {/* 選中時顯示的旋轉把手與縮放角 */}
+        {/* 選中時只在當前點擊的照片顯示獨立把手 */}
         {isSelected && (
           <div className="absolute inset-0 pointer-events-none z-30">
-            {/* 頂部 360° 旋轉控制把手 */}
+            {/* 頂部獨立 360° 旋轉把手 */}
             <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto control-handle">
               <button
                 onPointerDown={handleRotatePointerDown}
                 className="w-6 h-6 rounded-full bg-[#FFFFFF] border-[1.5px] border-[#E68A00] text-[#E68A00] flex items-center justify-center shadow-md hover:bg-[#E68A00] hover:text-white transition-colors cursor-grab active:cursor-grabbing"
-                title="按住旋轉照片"
+                title="按住旋轉此照片"
               >
                 <RotateCw className="w-3.5 h-3.5" />
               </button>
               <div className="w-[1.5px] h-2 bg-[#E68A00]" />
             </div>
 
-            {/* 四角縮放點 (細緻暖橙點，無生硬藍色框) */}
+            {/* 四角獨立縮放點 */}
             <div
               onPointerDown={(e) => handleScalePointerDown(e, true)}
               className="absolute -bottom-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#FFFFFF] border-[1.5px] border-[#E68A00] shadow-sm pointer-events-auto cursor-nwse-resize hover:scale-125 transition-transform control-handle"
-              title="拖動縮放大小"
+              title="拖動縮放此照片大小"
             />
             <div
               onPointerDown={(e) => handleScalePointerDown(e, false)}
               className="absolute -bottom-1.5 -left-1.5 w-3.5 h-3.5 rounded-full bg-[#FFFFFF] border-[1.5px] border-[#E68A00] shadow-sm pointer-events-auto cursor-nesw-resize hover:scale-125 transition-transform control-handle"
-              title="拖動縮放大小"
+              title="拖動縮放此照片大小"
             />
           </div>
         )}

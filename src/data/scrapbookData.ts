@@ -59,20 +59,28 @@ export const scrapbookMonths: MonthData[] = [
         textAfter: ' 姆姆姆'
       },
       {
-        textBefore: '抓水母抓得很起勁的咪真的好可愛，25號討論買電量問題，不知不覺吃了關東煮，最後還送了 ',
+        textBefore: '6號、拍了',
         triggerWord: {
-          groupId: 'group_10_duck',
-          label: '寶可夢可達鴨'
+          groupId: 'group_10_06',
+          label: '拍貼機📸、金G獨立咪🐣、很會抓水姆寶！',
         },
         textAfter: '！'
-      }
+      },
+      {
+        textBefore: '11、12號，',
+        triggerWord: {
+          groupId: 'group_10_11',
+          label: '搖滾台中',
+        },
+        textAfter: '！'
+      },
     ],
     photos: [
       {
         id: 'p_2025_10_03_1',
         groupId: 'group_10_03',
-        src: 'images/2025_10/2026-10-03.jpg',
-        fallbackSrc: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=700&auto=format&fit=crop&q=80',
+        src: 'images/2025_10/2025-10-03.jpg',
+        fallbackSrc: 'images/fail.jpg',
         caption: '倒鼻咪紀念照',
         defaultPosition: { topPercent: 8, leftPercent: 52, rotateDeg: -4 },
         tapeColor: 'yellow'
@@ -80,8 +88,8 @@ export const scrapbookMonths: MonthData[] = [
       {
         id: 'p_2025_10_04_1',
         groupId: 'group_10_04',
-        src: 'images/2025_10/2026-10-04 (1).jpg',
-        fallbackSrc: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=700&auto=format&fit=crop&q=80',
+        src: 'images/2025_10/2025-10-04 (1).jpg',
+        fallbackSrc: 'images/fail.jpg',
         caption: '大安森林公園拍咪 (1)',
         defaultPosition: { topPercent: 24, leftPercent: 20, rotateDeg: 3 },
         tapeColor: 'yellow'
@@ -89,21 +97,75 @@ export const scrapbookMonths: MonthData[] = [
       {
         id: 'p_2025_10_04_2',
         groupId: 'group_10_04',
-        src: 'images/2025_10/2026-10-04 (2).jpg',
-        fallbackSrc: 'https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=700&auto=format&fit=crop&q=80',
+        src: 'images/2025_10/2025-10-04 (2).jpg',
+        fallbackSrc: 'images/fail.jpg',
         caption: '大安森林公園拍咪 (2)',
         defaultPosition: { topPercent: 44, leftPercent: 48, rotateDeg: -3 },
         tapeColor: 'coral'
       },
       {
-        id: 'p_2025_10_duck_1',
-        groupId: 'group_10_duck',
-        src: 'images/2025_10/2025-10-25.jpg',
-        fallbackSrc: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=700&auto=format&fit=crop&q=80',
-        caption: '送給咪的寶可夢可達鴨',
+        id: 'p_2025_10_06_1',
+        groupId: 'group_10_06',
+        src: 'images/2025_10/2025-10-06 (1).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '金雞獨立咪！',
         defaultPosition: { topPercent: 58, leftPercent: 18, rotateDeg: 5 },
         tapeColor: 'mint'
-      }
+      },
+      {
+        id: 'p_2025_10_06_2',
+        groupId: 'group_10_06',
+        src: 'images/2025_10/2025-10-06 (2).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '相親相愛<3',
+        defaultPosition: { topPercent: 58, leftPercent: 10, rotateDeg: 5 },
+        tapeColor: 'mint'
+      },
+      {
+        id: 'p_2025_10_06_3',
+        groupId: 'group_10_06',
+        src: 'images/2025_10/2025-10-06 (3).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '拍立得',
+        defaultPosition: { topPercent: 58, leftPercent: 5, rotateDeg: -5 },
+        tapeColor: 'mint'
+      },
+      {
+        id: 'p_2025_10_06_4',
+        groupId: 'group_10_06',
+        src: 'images/2025_10/2025-10-06 (4).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '看起來很會抓水母',
+        defaultPosition: { topPercent: 58, leftPercent: 30, rotateDeg: 8 },
+        tapeColor: 'mint'
+      },
+      {
+        id: 'p_2025_10_11_01',
+        groupId: 'group_10_11',
+        src: 'images/2025_10/2025-10-11 (1).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '吃飯',
+        defaultPosition: { topPercent: 10, leftPercent: 30, rotateDeg: 8 },
+        tapeColor: 'mint'
+      },
+      {
+        id: 'p_2025_10_11_02',
+        groupId: 'group_10_11',
+        src: 'images/2025_10/2025-10-11 (2).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '搖滾台中',
+        defaultPosition: { topPercent: 67, leftPercent: 15, rotateDeg: 2 },
+        tapeColor: 'mint'
+      },
+      {
+        id: 'p_2025_10_11_03',
+        groupId: 'group_10_11',
+        src: 'images/2025_10/2025-10-11 (3).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '瞪咪',
+        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: 2 },
+        tapeColor: 'mint'
+      },
     ]
   },
 
