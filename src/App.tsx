@@ -134,7 +134,7 @@ export default function App() {
           <CelebrationSection
             onBlowCandle={() => setCurrentTrack('AgFeZr5ptV8')}
             onResetCandle={() => setCurrentTrack('gY5TgD-yRPI')}
-            pdfUrl="documents/2026_birthday_letter.pdf"
+            pdfUrl="https://github.com/GDot-dot/2026birthdaycard/releases/download/v1.0.1/2026_birthday_letter.pdf"
           />
 
           {/* 典雅頁腳 (無 AI 虛假儀表板，乾淨真誠) */}
