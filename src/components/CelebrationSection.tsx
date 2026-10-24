@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
 import { BeretIcon, PawPrintIcon, PurinFaceIcon } from './DecorativeOrnaments';
-import { Sparkles, Heart, RotateCcw } from 'lucide-react';
+import { Sparkles, Heart, RotateCcw, FileText, ExternalLink } from 'lucide-react';
+import { LetterPdfViewerModal } from './LetterPdfViewerModal';
 
-export const CelebrationSection: React.FC = () => {
+interface CelebrationSectionProps {
+  onBlowCandle?: () => void;
+  onResetCandle?: () => void;
+  pdfUrl?: string;
+}
+
+export const CelebrationSection: React.FC<CelebrationSectionProps> = ({
+  onBlowCandle,
+  onResetCandle,
+  pdfUrl = 'documents/2026_birthday_letter.pdf'
+}) => {
   const [isBlown, setIsBlown] = useState(false);
+  const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
 
   const handleBlowCandle = () => {
     setIsBlown(true);
+    onBlowCandle?.();
 
     // 豪華暖金與繽紛生日紙花盛宴
     confetti({
@@ -37,6 +50,7 @@ export const CelebrationSection: React.FC = () => {
 
   const handleReset = () => {
     setIsBlown(false);
+    onResetCandle?.();
   };
 
   return (
@@ -95,7 +109,7 @@ export const CelebrationSection: React.FC = () => {
         <div className="w-full max-w-xl bg-[#FFFFFF] border-[2px] border-[#4A3319] rounded-3xl p-8 sm:p-10 shadow-[0_18px_45px_rgba(74,51,25,0.14)] animate-in fade-in zoom-in-95 duration-500">
           <div className="flex items-center justify-center gap-2 text-[#E68A00] mb-3">
             <PawPrintIcon size={16} />
-            <span className="text-xs font-bold tracking-widest uppercase">Birthday Wish for Mi</span>
+            <span className="text-xs font-bold tracking-widest uppercase">Birthday Wish for Phoebe</span>
             <PawPrintIcon size={16} />
           </div>
 
@@ -107,6 +121,32 @@ export const CelebrationSection: React.FC = () => {
             願新的一歲裡，所有的日子都能更加順利勢如破竹，生活充滿意想不到的困難寶寶都能與咪一起協心克服。
             無論是大安森林公園的散步、鐵道旅行、或是今日的冬日溫泉，我們一起創造了無數的回憶！未來也一起牽手走下去。
           </p>
+
+          {/* 💌 專屬手寫信 / 紀念 PDF 附錄插槽 */}
+          <div className="my-6 p-4 rounded-2xl bg-[#FFF9E6] border-[1.5px] border-[#E68A00]/40 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#FED458] border border-[#4A3319] flex items-center justify-center text-[#4A3319] shrink-0 shadow-sm">
+                <FileText className="w-5 h-5 text-[#4A3319]" />
+              </div>
+              <div className="text-left">
+                <div className="font-bold text-sm text-[#4A3319] flex items-center gap-1.5">
+                  <span>給咪的一封秘密手寫信</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#E68A00] text-white font-mono font-bold">
+                    PDF
+                  </span>
+                </div>
+                <p className="text-xs text-[#8C6D4F] mt-0.5">點擊即刻在線展開閱讀專屬信件</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsPdfModalOpen(true)}
+              className="px-4 py-2 bg-[#FED458] hover:bg-[#FFC629] text-[#4A3319] font-bold text-xs rounded-full border border-[#4A3319] shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>點此翻開信件</span>
+            </button>
+          </div>
 
           <div className="flex items-center justify-center gap-2 text-sm font-bold text-[#8C6D4F] pt-4 border-t border-dashed border-[#EAE0D3]">
             <Heart className="w-4 h-4 text-[#F28B82] fill-current" />
@@ -123,6 +163,13 @@ export const CelebrationSection: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* 典雅在線 PDF 手寫信彈窗 (以 HTML5 Canvas 渲染，徹底解決 iframe 俄羅斯娃娃問題) */}
+      <LetterPdfViewerModal
+        isOpen={isPdfModalOpen}
+        onClose={() => setIsPdfModalOpen(false)}
+        pdfUrl={pdfUrl}
+      />
     </section>
   );
 };

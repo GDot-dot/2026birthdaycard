@@ -19,6 +19,7 @@ const STORAGE_KEY = 'purin_birthday_scrapbook_state_v5';
 export default function App() {
   const [isEnvelopeOpened, setIsEnvelopeOpened] = useState(false);
   const [photoStates, setPhotoStates] = useState<Record<string, PhotoState>>({});
+  const [currentTrack, setCurrentTrack] = useState('gY5TgD-yRPI');
 
   // 1. 載入本機記憶的照片拼貼狀態 (相容先前儲存資料)
   useEffect(() => {
@@ -92,7 +93,7 @@ export default function App() {
       <CustomCursor />
 
       {/* 典雅復古音樂播放艙 */}
-      <AudioDeck shouldPlay={isEnvelopeOpened} />
+      <AudioDeck shouldPlay={isEnvelopeOpened} currentVideoId={currentTrack} />
 
       {/* 第一幕：3D 視差開合立體信封 */}
       {!isEnvelopeOpened ? (
@@ -129,8 +130,12 @@ export default function App() {
             onBatchUpdatePhotoState={handleBatchUpdatePhotoState}
           />
 
-          {/* 底部：互動吹蠟燭生日祝賀與真摯賀詞 */}
-          <CelebrationSection />
+          {/* 底部：互動吹蠟燭生日祝賀與真摯賀詞 (吹熄後自動切換慶祝音樂，內附專屬手寫信 PDF) */}
+          <CelebrationSection
+            onBlowCandle={() => setCurrentTrack('AgFeZr5ptV8')}
+            onResetCandle={() => setCurrentTrack('gY5TgD-yRPI')}
+            pdfUrl="documents/2026_birthday_letter.pdf"
+          />
 
           {/* 典雅頁腳 (無 AI 虛假儀表板，乾淨真誠) */}
           <footer className="mt-16 pb-12 text-center text-xs text-[#8C6D4F]/80 flex flex-col items-center gap-2 select-none">

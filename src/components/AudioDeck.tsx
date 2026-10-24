@@ -4,6 +4,7 @@ import { BeretIcon } from './DecorativeOrnaments';
 
 interface AudioDeckProps {
   shouldPlay?: boolean;
+  currentVideoId?: string;
 }
 
 declare global {
@@ -13,7 +14,10 @@ declare global {
   }
 }
 
-export const AudioDeck: React.FC<AudioDeckProps> = ({ shouldPlay = false }) => {
+export const AudioDeck: React.FC<AudioDeckProps> = ({
+  shouldPlay = false,
+  currentVideoId = 'gY5TgD-yRPI'
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(70);
@@ -21,6 +25,7 @@ export const AudioDeck: React.FC<AudioDeckProps> = ({ shouldPlay = false }) => {
 
   const playerRef = useRef<any>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
+  const currentVideoIdRef = useRef<string>(currentVideoId);
 
   useEffect(() => {
     // 載入 YouTube Iframe API
@@ -37,12 +42,12 @@ export const AudioDeck: React.FC<AudioDeckProps> = ({ shouldPlay = false }) => {
         playerRef.current = new window.YT.Player('ytPlayer-container', {
           height: '60',
           width: '60',
-          videoId: 'gY5TgD-yRPI',
+          videoId: currentVideoIdRef.current,
           playerVars: {
             autoplay: 0,
             controls: 0,
             loop: 1,
-            playlist: 'gY5TgD-yRPI',
+            playlist: currentVideoIdRef.current,
             playsinline: 1,
             enablejsapi: 1
           },
@@ -85,6 +90,30 @@ export const AudioDeck: React.FC<AudioDeckProps> = ({ shouldPlay = false }) => {
       }
     };
   }, []);
+
+  // 當歌曲 Video ID 切換時（例如吹熄蠟燭後切換至 AgFeZr5ptV8）
+  useEffect(() => {
+    if (
+      isPlayerReady &&
+      playerRef.current &&
+      currentVideoId &&
+      currentVideoId !== currentVideoIdRef.current
+    ) {
+      currentVideoIdRef.current = currentVideoId;
+      try {
+        if (typeof playerRef.current.loadVideoById === 'function') {
+          playerRef.current.loadVideoById({
+            videoId: currentVideoId
+          });
+          playerRef.current.unMute();
+          playerRef.current.playVideo();
+          setIsPlaying(true);
+        }
+      } catch (err) {
+        console.warn('Switch video error:', err);
+      }
+    }
+  }, [currentVideoId, isPlayerReady]);
 
   // 當外部信封拆開時自動觸發音樂播放
   useEffect(() => {
@@ -175,7 +204,7 @@ export const AudioDeck: React.FC<AudioDeckProps> = ({ shouldPlay = false }) => {
         <div className="hidden sm:flex flex-col text-left">
           <span className="text-[11px] font-bold text-[#4A3319] leading-tight flex items-center gap-1">
             <BeretIcon size={12} className="text-[#4A3319]" />
-            🍮布丁狗駐唱！
+            {currentVideoId === 'AgFeZr5ptV8' ? '許願慶祝曲 🎂' : '咪的生日旋律'}
           </span>
           <span className="text-[9px] text-[#8C6D4F] leading-tight font-sans">
             {isPlaying ? '播放中 ♬' : '已暫停'}
