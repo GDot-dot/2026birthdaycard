@@ -198,7 +198,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-11 (2).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '搖滾台中',
-        defaultPosition: { topPercent: 67, leftPercent: 15, rotateDeg: 2 },
+        defaultPosition: { topPercent: 20, leftPercent: 15, rotateDeg: 2 },
         tapeColor: 'mint'
       },
       {
@@ -207,7 +207,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-11 (3).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '瞪咪',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: 2 },
+        defaultPosition: { topPercent: 20, leftPercent: 45, rotateDeg: 2 },
         tapeColor: 'mint'
       },
       {
@@ -234,7 +234,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-18 (3).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '皮克敏',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: 2 },
+        defaultPosition: { topPercent: 40, leftPercent: 45, rotateDeg: 2 },
         tapeColor: '#27C5F5'
       },
       {
@@ -243,7 +243,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-18 (4).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '漂亮咪',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: -6 },
+        defaultPosition: { topPercent: 40, leftPercent: 45, rotateDeg: -6 },
         tapeColor: '#27C5F5'
       },
       {
@@ -252,7 +252,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-18 (5).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '是不是偷吃泡麵',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: 10 },
+        defaultPosition: { topPercent: 40, leftPercent: 45, rotateDeg: 10 },
         tapeColor: '#27C5F5'
       },
       {
@@ -270,7 +270,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-25 (1).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '吃關東煮',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: 14 },
+        defaultPosition: { topPercent: 50, leftPercent: 45, rotateDeg: 14 },
         tapeColor: '#CEF522'
       },
       {
@@ -279,7 +279,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-25 (2).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '幹嘛咬我！',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: -10 },
+        defaultPosition: { topPercent: 40, leftPercent: 45, rotateDeg: -10 },
         tapeColor: '#CEF522'
       },
       {
@@ -288,7 +288,7 @@ export const scrapbookMonths: MonthData[] = [
         src: 'images/2025_10/2025-10-25 (3).jpg',
         fallbackSrc: 'images/fail.jpg',
         caption: '咪枕可達鴨',
-        defaultPosition: { topPercent: 67, leftPercent: 45, rotateDeg: 0 },
+        defaultPosition: { topPercent: 50, leftPercent: 45, rotateDeg: 0 },
         tapeColor: '#CEF522'
       },
       {
@@ -1863,10 +1863,10 @@ export const scrapbookMonths: MonthData[] = [
   // ── 12. 2026.09 ─────────────────────────────────────────────
   {
     id: 'month_2026_09',
-    titleBadge: '2026 . 09 ・ 初秋微涼與倒數生日',
+    titleBadge: '2026 . 09 ・ 火車旅行與倒數生日',
     subHeader: 'September Birthday Countdown',
-    themeColor: '#FFA000',
-    washiType: 'yellow',
+    themeColor: '	#4F6D97',
+    washiType: '#4F6D97',
     diaryHtmlFragments: [
       {
         textBefore: '轉眼來到了九月，微涼的秋風拂過，走進了準備迎接生日前夕的倒數月！這天一起去了 ',

@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { CustomCursor } from './components/CustomCursor';
 import { AudioDeck } from './components/AudioDeck';
 import { EnvelopeScreen } from './components/EnvelopeScreen';
-import { ScrapbookMonthCard } from './components/ScrapbookMonthCard';
+import { ScrapbookFlipBook } from './components/ScrapbookFlipBook';
 import { CelebrationSection } from './components/CelebrationSection';
 import { scrapbookMonths } from './data/scrapbookData';
 import { PhotoState } from './types';
@@ -111,28 +111,23 @@ export default function App() {
             </div>
 
             <h1 className="font-['Caveat'] text-5xl sm:text-6xl md:text-7xl font-bold text-[#4A3319] leading-tight mb-2">
-              寶貝咪 24 歲生日卡片
+              寶貝咪 24 歲生日月記
             </h1>
 
             <p className="text-sm sm:text-base font-bold text-[#8C6D4F] max-w-lg mx-auto flex items-center justify-center gap-1.5 mt-2">
               <Sparkles className="w-4 h-4 text-[#E68A00]" />
-              回顧2025一年份的歡笑、溫暖與經歷！
+              收集這一年份的歡笑、溫暖與點滴心動
               <Sparkles className="w-4 h-4 text-[#E68A00]" />
             </p>
           </header>
 
-          {/* 三個月份手帳賀卡主卡片 */}
-          <div className="space-y-6 sm:space-y-10">
-            {scrapbookMonths.map((month) => (
-              <ScrapbookMonthCard
-                key={month.id}
-                month={month}
-                photoStates={photoStates}
-                onUpdatePhotoState={handleUpdatePhotoState}
-                onBatchUpdatePhotoState={handleBatchUpdatePhotoState}
-              />
-            ))}
-          </div>
+          {/* 手帳賀卡翻頁書 (平滑實體紙張翻閱視覺體驗與多月份索引標籤) */}
+          <ScrapbookFlipBook
+            months={scrapbookMonths}
+            photoStates={photoStates}
+            onUpdatePhotoState={handleUpdatePhotoState}
+            onBatchUpdatePhotoState={handleBatchUpdatePhotoState}
+          />
 
           {/* 底部：互動吹蠟燭生日祝賀與真摯賀詞 */}
           <CelebrationSection />
