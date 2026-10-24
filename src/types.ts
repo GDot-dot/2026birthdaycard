@@ -34,12 +34,30 @@ export interface DiaryFragment {
   textAfter?: string;
 }
 
+export interface MemoNoteItem {
+  text: string;
+  tapeColor?: string;
+  rotateDeg?: number;
+}
+
+export interface TicketStubItem {
+  title: string;
+  detail: string;
+  code?: string;
+  date?: string;
+}
+
 export interface MonthData {
   id: string;
   titleBadge: string;
   subHeader: string;
   themeColor: string;
   washiType?: 'yellow' | 'coral' | 'mint' | 'lavender' | 'sky' | 'sakura' | 'matcha' | 'caramel' | string;
+  canvasHeight?: number; // 自由指定畫布高度（例如 600, 680, 750），不必塞字也能擁有廣闊拼貼空間
+  weather?: 'sunny' | 'breeze' | 'rainy' | 'starlight' | 'warm'; // 手帳天氣圖章
+  mood?: string; // 心情指數，例如 "100% 甜蜜"、"笑到肚子痛"
+  memoNote?: MemoNoteItem; // 手寫小便條紙貼片
+  ticketStub?: TicketStubItem; // 復古紀念票根
   diaryHtmlFragments: DiaryFragment[];
   photos: PhotoItem[];
 }

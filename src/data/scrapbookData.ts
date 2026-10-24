@@ -27,19 +27,29 @@ import { MonthData } from '../types';
  *         text: '我們泡了 [溫泉之旅](group_onsen) ![泡湯](images/onsen.gif)，看咪笑得好開心！'
  *       }
  * 
- * 3. 經典單一關鍵字寫法：
+ * 3. 🎨 【如何把畫布弄大 ＆ 不塞太多字豐富畫面】：
+ *    👉 1. 自由指定畫布高度：在月份加上 `canvasHeight: 650`（預設 560px，可填 600、680、750 等）
+ *    👉 2. 手帳天氣與心情圖章：
+ *          weather: 'sunny' | 'breeze' | 'rainy' | 'starlight' | 'warm'
+ *          mood: '倒鼻咪 100% 💖' 或 '心動滿分 ✨'
+ *    👉 3. 手寫便條紙貼片 (Memo Note)：
+ *          memoNote: { text: '抓水母抓到笑倒在沙發上，世界上最可愛的咪！' }
+ *    👉 4. 復古門票/紀念票根 (Ticket Stub)：
+ *          ticketStub: { title: 'TWICE 演唱會入場券', detail: '特區搖滾區', code: 'TW-1122' }
+ * 
+ * 4. 經典單一關鍵字寫法：
  *    {
  *      textBefore: '那天我們一起去看了 ',
  *      triggerWord: { groupId: 'group_name', label: '倒鼻咪！' },
  *      textAfter: ' 真的好好笑。'
  *    }
  * 
- * 4. 單純文字段落（無按鈕）：
+ * 5. 單純文字段落（無按鈕）：
  *    {
  *      text: '這是一段純心情筆記，不需要任何按鈕。'
  *    }
  * 
- * 5. 新增照片與 groupId 連動：
+ * 6. 新增照片與 groupId 連動：
  *    在該月份的 `photos` 陣列中新增一筆物件，例如：
  *    {
  *      id: 'p_2026_01_new',
@@ -1864,46 +1874,399 @@ export const scrapbookMonths: MonthData[] = [
   {
     id: 'month_2026_09',
     titleBadge: '2026 . 09 ・ 火車旅行與倒數生日',
+    canvasHeight: 1500,
     subHeader: 'September Birthday Countdown',
     themeColor: '	#4F6D97',
     washiType: '#4F6D97',
     diaryHtmlFragments: [
       {
-        textBefore: '轉眼來到了九月，微涼的秋風拂過，走進了準備迎接生日前夕的倒數月！這天一起去了 ',
+        textBefore: '5、咪跟家人出遊兩天！ ',
         triggerWord: {
-          groupId: 'group_26_09_cafe',
-          label: '充滿溫暖木質調的手作甜點坊'
+          groupId: 'group_26_09_05',
+          label: '出去玩！'
         },
-        textAfter: '，悄悄籌備著給咪的驚喜。'
+        textAfter: '帶著布丁鼠、跟小象'
       },
       {
-        textBefore: '翻看著過去一整年滿滿的拍立得手記，看著 ',
+        textBefore: '12、跟咪趕場！！有上次的經驗這一次快快地抵達 ',
         triggerWord: {
-          groupId: 'group_26_09_memories',
-          label: '這一年裡咪大笑的每一個瞬間'
+          groupId: 'group_26_09_12',
+          label: '超脫樂團之我要幹大事'
         },
-        textAfter: '，心中滿溢著無窮的感謝與珍視。24 歲生日即將到來，每一天都更愛你一點！'
-      }
+        textAfter: '睽違8年以上的真實拍攝！超酷！ ![ㄉㄨㄞ|30](images/stickers/ㄉㄨㄞㄉㄨㄞ.gif)'
+      },
+      {
+        textBefore: '18、寶寶選到一間酷酷飯店 ',
+        triggerWord: {
+          groupId: 'group_26_09_18',
+          label: '住一晚'
+        },
+        textAfter: '很多日本人來住，跟很多特別的泡麵可以吃![趴|40](images/stickers/趴.gif)'
+      },
+      {
+        textBefore: '19、火車之旅！跑到',
+        triggerWord: {
+          groupId: 'group_26_09_19',
+          label: '十分、平溪、嶺腳、九份'
+        },
+        textAfter: '開心！出去玩得很開心！'
+      },
+      {
+        textBefore: '\n\n\n\n\n\n',
+      },
     ],
     photos: [
       {
-        id: 'p_2026_09_1',
-        groupId: 'group_26_09_cafe',
-        src: 'images/2026_09/2026_09_10-1.png',
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (1).jpg',
         fallbackSrc: 'images/fail.jpg',
-        caption: '秋日溫暖的咖啡香氣',
-        defaultPosition: { topPercent: 10, leftPercent: 42, rotateDeg: 4 },
-        tapeColor: 'yellow'
+        caption: '星空！',
+        defaultPosition: { topPercent: 0, leftPercent: 0, rotateDeg: 4 },
+        tapeColor: '#4F6D97'
       },
       {
-        id: 'p_2026_09_2',
-        groupId: 'group_26_09_memories',
-        src: 'images/2026_09/2026_09_28-1.png',
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (2).jpg',
         fallbackSrc: 'images/fail.jpg',
-        caption: '最珍貴的大笑笑顏',
-        defaultPosition: { topPercent: 44, leftPercent: 20, rotateDeg: -3 },
-        tapeColor: 'coral'
-      }
+        caption: '魷魚圈！',
+        defaultPosition: { topPercent: 0, leftPercent: 20, rotateDeg: -4 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (3).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '大鼻丁鼠ㄘ！',
+        defaultPosition: { topPercent: 0, leftPercent: 40, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (4).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '大鼻好朋友',
+        defaultPosition: { topPercent: 0, leftPercent: 60, rotateDeg: -4 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (5).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '豐盛早餐！',
+        defaultPosition: { topPercent: 0, leftPercent: 80, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (6).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: 'ㄘ!!!',
+        defaultPosition: { topPercent: 20, leftPercent: 0, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (7).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: 'ㄘ!!!!!!！',
+        defaultPosition: { topPercent: 20, leftPercent: 20, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (8).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: 'ㄚ沙灘',
+        defaultPosition: { topPercent: 20, leftPercent: 40, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (9).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: 'ㄚ大鼻象',
+        defaultPosition: { topPercent: 20, leftPercent: 60, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (10).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: 'ㄚ沙灘',
+        defaultPosition: { topPercent: 20, leftPercent: 80, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_05',
+        groupId: 'group_26_09_05',
+        src: 'images/2026_09/2026-09-05 (11).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: 'ㄚ帳棚',
+        defaultPosition: { topPercent: 40, leftPercent: 0, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_12',
+        groupId: 'group_26_09_12',
+        src: 'images/2026_09/2026-09-12.jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '電影票根',
+        defaultPosition: { topPercent: 40, leftPercent: 20, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_18',
+        groupId: 'group_26_09_18',
+        src: 'images/2026_09/2026-09-18.jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '大欣旅館',
+        defaultPosition: { topPercent: 40, leftPercent: 40, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (1).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '好吃便宜乾麵',
+        defaultPosition: { topPercent: 0, leftPercent: 0, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (5).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '勇敢走下去漂亮咪',
+        defaultPosition: { topPercent: 0, leftPercent: 15, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (2).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '背影漂亮咪',
+        defaultPosition: { topPercent: 0, leftPercent: 30, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (4).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '蘑菇',
+        defaultPosition: { topPercent: 0, leftPercent: 45, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (3).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '嶺腳瀑布景',
+        defaultPosition: { topPercent: 0, leftPercent: 60, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (6).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '漂亮回眸咪',
+        defaultPosition: { topPercent: 20, leftPercent: 0, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (13).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '大景瀑布',
+        defaultPosition: { topPercent: 20, leftPercent: 30, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (14).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '瀑布&咪',
+        defaultPosition: { topPercent: 20, leftPercent: 15, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (7).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '隱密溫馨的小店',
+        defaultPosition: { topPercent: 35, leftPercent: 30, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (8).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '瓜習柑',
+        defaultPosition: { topPercent: 0, leftPercent:80, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (9).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '寶拍星空',
+        defaultPosition: { topPercent: 20, leftPercent: 60, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (16).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '咪拍星空',
+        defaultPosition: { topPercent: 20, leftPercent: 80, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (10).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '火車',
+        defaultPosition: { topPercent: 45, leftPercent: 0, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (11).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '後站通行證',
+        defaultPosition: { topPercent: 45, leftPercent: 25, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (15).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '摸摸貓咪',
+        defaultPosition: { topPercent: 45, leftPercent: 50, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (17).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '米跌早餐',
+        defaultPosition: { topPercent: 45, leftPercent: 70, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (18).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '綜合五味香腸',
+        defaultPosition: { topPercent: 70, leftPercent: 0, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (19).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '五味大雞排',
+        defaultPosition: { topPercent: 70, leftPercent: 20, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (20).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '姊妹雞腿捲',
+        defaultPosition: { topPercent: 70, leftPercent: 40, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (21).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '石花凍',
+        defaultPosition: { topPercent: 70, leftPercent: 60, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (12).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '九份',
+        defaultPosition: { topPercent: 70, leftPercent: 80, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (22).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '九份巷內',
+        defaultPosition: { topPercent: 82, leftPercent: 0, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (24).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '九份巷內',
+        defaultPosition: { topPercent: 82, leftPercent: 20, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (23).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '開心寶&咪九份合照',
+        defaultPosition: { topPercent: 82, leftPercent: 40, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (25).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '平溪街道',
+        defaultPosition: { topPercent: 82, leftPercent: 60, rotateDeg: 5 },
+        tapeColor: '#4F6D97'
+      },
+      {
+        id: 'p_2026_09_19',
+        groupId: 'group_26_09_19',
+        src: 'images/2026_09/2026-09-19 (26).jpg',
+        fallbackSrc: 'images/fail.jpg',
+        caption: '溪隱小陽台',
+        defaultPosition: { topPercent: 82, leftPercent: 80, rotateDeg: -5 },
+        tapeColor: '#4F6D97'
+      },
     ]
   }
 ];

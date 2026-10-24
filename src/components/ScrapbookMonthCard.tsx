@@ -3,7 +3,8 @@ import gsap from 'gsap';
 import confetti from 'canvas-confetti';
 import { MonthData, PhotoItem, PhotoState } from '../types';
 import { TransformablePolaroid, PolaroidHandle } from './TransformablePolaroid';
-import { FukubukuroIcon, PostalStampMark, PawPrintIcon } from './DecorativeOrnaments';
+import { FukubukuroIcon, PawPrintIcon } from './DecorativeOrnaments';
+import { InteractivePostalStamp } from './InteractivePostalStamp';
 
 interface ScrapbookMonthCardProps {
   month: MonthData;
@@ -325,17 +326,45 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
           </span>
         </div>
 
-        {/* 復古郵戳點綴 */}
-        <div className="hidden sm:block">
-          <PostalStampMark label="MEMORY" date={month.id.replace('month_', '').replace('_', '.')} />
+        {/* 互動式復古紀念郵戳 (可點擊蓋印、切換款式並播放蓋章聲) */}
+        <div className="flex items-center">
+          <InteractivePostalStamp
+            label="MEMORY"
+            date={month.id.replace('month_', '').replace('_', '.')}
+            themeColor={themeHex}
+          />
         </div>
       </div>
 
-      {/* 手帳分欄排版 (左側文字日記 + 右側照片自由拼貼大畫布) */}
-      <div className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8 min-h-[520px]">
+      {/* 手帳分欄排版 (左側文字日記 + 右側照片自由拼貼大畫布，支援自訂 canvasHeight 自由放大畫布) */}
+      <div
+        style={{ minHeight: `${month.canvasHeight || 560}px` }}
+        className="grid grid-cols-1 lg:grid-cols-[420px_1fr] gap-8"
+      >
         {/* 左側：手帳文字筆記欄 */}
         <div className="bg-[#FFFDF6]/90 border-[1.5px] border-[#EAE0D3] rounded-2xl p-6 sm:p-7 shadow-sm flex flex-col justify-between">
           <div>
+            {/* 可選的天氣與心情手帳圖章 */}
+            {(month.weather || month.mood) && (
+              <div className="flex flex-wrap items-center gap-2 mb-3 text-xs text-[#8C6D4F] select-none">
+                {month.weather && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF4CE] border border-[#E8D9C5] font-bold">
+                    {month.weather === 'sunny' && '☀️ 晴空萬里'}
+                    {month.weather === 'breeze' && '🍃 舒服微風'}
+                    {month.weather === 'rainy' && '🌧️ 浪漫小雨'}
+                    {month.weather === 'starlight' && '✨ 滿天星斗'}
+                    {month.weather === 'warm' && '🌸 溫暖初陽'}
+                  </span>
+                )}
+                {month.mood && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF0F0] border border-[#FAD2D2] text-[#C84B31] font-bold">
+                    <span>♥</span>
+                    <span>{month.mood}</span>
+                  </span>
+                )}
+              </div>
+            )}
+
             <div
               style={{
                 color: themeHex || '#E68A00',
@@ -497,6 +526,43 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
                 );
               })}
             </div>
+            {/* 可選的手寫小便條貼 (Pastel Memo Note) */}
+            {month.memoNote && (
+              <div
+                style={{ transform: `rotate(${month.memoNote.rotateDeg ?? -1.5}deg)` }}
+                className="relative mt-5 p-3.5 bg-[#FFFDE8] border border-[#EFE5B8] rounded-md shadow-sm select-none"
+              >
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-3.5 washi-tape opacity-85 rounded-xs" />
+                <p className="font-['Caveat'] text-lg text-[#5C3D28] leading-snug">
+                  “ {month.memoNote.text} ”
+                </p>
+              </div>
+            )}
+
+            {/* 可選的復古門票/紀念票根 (Vintage Ticket Stub) */}
+            {month.ticketStub && (
+              <div className="relative mt-5 p-3 bg-[#FAF4EA] border-[1.5px] border-dashed border-[#D6C4AF] rounded-lg shadow-xs flex items-center justify-between gap-3 overflow-hidden select-none">
+                <div className="flex flex-col">
+                  <span className="text-[9.5px] uppercase tracking-wider text-[#A89885] font-bold">
+                    SPECIAL TICKET STUB
+                  </span>
+                  <span className="font-bold text-sm text-[#4A3319] leading-tight mt-0.5">
+                    {month.ticketStub.title}
+                  </span>
+                  <span className="text-xs text-[#8C6D4F] mt-0.5">
+                    {month.ticketStub.detail}
+                  </span>
+                </div>
+                <div className="shrink-0 flex flex-col items-end border-l border-dashed border-[#D6C4AF] pl-3">
+                  <span className="font-mono text-[10px] text-[#A89885] tracking-widest">
+                    {month.ticketStub.code || 'NO. 1024'}
+                  </span>
+                  <span className="text-[10px] font-bold text-[#E68A00] mt-1">
+                    VERIFIED
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-6 pt-4 border-t border-[#EAE0D3] flex items-center justify-between text-xs text-[#8C6D4F]">
@@ -513,8 +579,18 @@ export const ScrapbookMonthCard: React.FC<ScrapbookMonthCardProps> = ({
           </div>
         </div>
 
-        {/* 右側：自由擺放拍立得畫布區 */}
-        <div className="relative bg-[#FAF6F0]/60 border-2 border-dashed border-[#E0D6C6] rounded-2xl min-h-[480px] overflow-hidden p-4">
+        {/* 右側：自由擺放拍立得畫布區 (日系 24px 手帳方格紙底紋與自訂 canvasHeight) */}
+        <div
+          style={{
+            minHeight: `${month.canvasHeight || 560}px`,
+            backgroundImage: `
+              linear-gradient(to right, rgba(74, 51, 25, 0.04) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(74, 51, 25, 0.04) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px'
+          }}
+          className="relative bg-[#FAF6F0]/70 border-2 border-dashed border-[#E0D6C6] rounded-2xl overflow-hidden p-4"
+        >
           {/* 畫布空狀態引導 */}
           {hiddenCount === month.photos.length && (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center pointer-events-none opacity-60">

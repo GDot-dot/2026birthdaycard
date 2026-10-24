@@ -76,7 +76,7 @@ export const CelebrationSection: React.FC = () => {
 
           <div className="mt-2 flex items-center justify-center gap-2">
             <PurinFaceIcon size={26} />
-            <span className="font-['Caveat'] text-2xl font-bold text-[#4A3319]">For Mi</span>
+            <span className="font-['Caveat'] text-2xl font-bold text-[#4A3319]">For Phoebe</span>
           </div>
         </div>
       </div>
@@ -104,7 +104,8 @@ export const CelebrationSection: React.FC = () => {
           </h3>
 
           <p className="text-base sm:text-lg leading-relaxed text-[#5C3D28] font-medium mb-6">
-            願新的一歲裡，所有的日子都如布丁般甜潤溫暖，生活充滿意想不到的驚喜與笑容。無論是大安森林公園的散步、熱血合唱的演唱會、或是暖呼呼的冬日溫泉，謝謝你給予的每一個珍貴回憶。
+            願新的一歲裡，所有的日子都能更加順利勢如破竹，生活充滿意想不到的困難寶寶都能與咪一起協心克服。
+            無論是大安森林公園的散步、鐵道旅行、或是今日的冬日溫泉，我們一起創造了無數的回憶！未來也一起牽手走下去。
           </p>
 
           <div className="flex items-center justify-center gap-2 text-sm font-bold text-[#8C6D4F] pt-4 border-t border-dashed border-[#EAE0D3]">
