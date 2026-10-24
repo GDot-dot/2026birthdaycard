@@ -139,6 +139,56 @@
   );
 }
 
+.washi-tape-lavender {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(186, 160, 220, 0.75),
+    rgba(186, 160, 220, 0.75) 6px,
+    rgba(215, 195, 240, 0.85) 6px,
+    rgba(215, 195, 240, 0.85) 12px
+  );
+}
+
+.washi-tape-sky {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(135, 206, 235, 0.75),
+    rgba(135, 206, 235, 0.75) 6px,
+    rgba(175, 225, 245, 0.85) 6px,
+    rgba(175, 225, 245, 0.85) 12px
+  );
+}
+
+.washi-tape-sakura {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 182, 193, 0.75),
+    rgba(255, 182, 193, 0.75) 6px,
+    rgba(255, 210, 220, 0.85) 6px,
+    rgba(255, 210, 220, 0.85) 12px
+  );
+}
+
+.washi-tape-matcha {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(165, 185, 130, 0.75),
+    rgba(165, 185, 130, 0.75) 6px,
+    rgba(195, 215, 160, 0.85) 6px,
+    rgba(195, 215, 160, 0.85) 12px
+  );
+}
+
+.washi-tape-caramel {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(210, 150, 90, 0.75),
+    rgba(210, 150, 90, 0.75) 6px,
+    rgba(235, 185, 135, 0.85) 6px,
+    rgba(235, 185, 135, 0.85) 12px
+  );
+}
+
 /* 賀卡手撕邊緣與立體折疊陰影 */
 .greeting-card-deck {
   background: #FFFFFF;

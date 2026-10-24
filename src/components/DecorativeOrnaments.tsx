@@ -78,12 +78,17 @@ export const HandDrawnSparkle: React.FC<{ className?: string; size?: number }> =
 );
 
 // 細緻小腳印章 (代替 🐾 emoji)
-export const PawPrintIcon: React.FC<{ className?: string; size?: number }> = ({ className = '', size = 16 }) => (
+export const PawPrintIcon: React.FC<{ className?: string; size?: number; style?: React.CSSProperties }> = ({
+  className = '',
+  size = 16,
+  style
+}) => (
   <svg
     width={size}
     height={size}
     viewBox="0 0 24 24"
     fill="currentColor"
+    style={style}
     className={`inline-block ${className}`}
   >
     <circle cx="6" cy="7" r="2.2" />

@@ -13,8 +13,13 @@ interface TransformablePolaroidProps {
   isSelected: boolean;
   onSelect: () => void;
   onUpdateState: (id: string, updates: Partial<PhotoState>) => void;
-  onDragMove?: (e: MouseEvent | TouchEvent, el: HTMLDivElement) => void;
-  onDragEnd?: (el: HTMLDivElement) => void;
+  onDragMove?: (e: PointerEvent, el: HTMLDivElement) => void;
+  onDragEnd?: (
+    photoId: string,
+    el: HTMLDivElement,
+    initialPos: { x: number; y: number },
+    e: PointerEvent
+  ) => void;
 }
 
 export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePolaroidProps>(
@@ -90,12 +95,12 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
         }
       };
 
-      const onPointerUp = () => {
+      const onPointerUp = (ev: PointerEvent) => {
         setIsDragging(false);
         window.removeEventListener('pointermove', onPointerMove);
         window.removeEventListener('pointerup', onPointerUp);
         if (polaroidRef.current && onDragEnd) {
-          onDragEnd(polaroidRef.current);
+          onDragEnd(actualId, polaroidRef.current, { x: initialPosX, y: initialPosY }, ev);
         }
       };
 
@@ -155,12 +160,49 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
       window.addEventListener('pointerup', onScaleUp);
     };
 
-    const tapeBgClass =
-      photo.tapeColor === 'coral'
-        ? 'washi-tape-coral'
-        : photo.tapeColor === 'mint'
-        ? 'washi-tape-mint'
-        : 'washi-tape';
+    // 支援色碼（例如 '#FFB6C1'、'#87CEEB'、甚至未加 '#' 的 'FFB6C1'）或預設風格名稱
+    const parseCustomTapeColor = (val?: string): string | undefined => {
+      if (!val) return undefined;
+      const trimmed = val.trim();
+      if (trimmed.startsWith('#') || trimmed.startsWith('rgb') || trimmed.startsWith('hsl')) {
+        return trimmed;
+      }
+      if (/^[0-9a-fA-F]{3,8}$/.test(trimmed)) {
+        return `#${trimmed}`;
+      }
+      return undefined;
+    };
+
+    const customTapeColor = parseCustomTapeColor(photo.tapeColor);
+
+    const customTapeStyle = customTapeColor ? {
+      background: `repeating-linear-gradient(
+        -45deg,
+        ${customTapeColor}cc,
+        ${customTapeColor}cc 6px,
+        ${customTapeColor}90 6px,
+        ${customTapeColor}90 12px
+      )`,
+      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)'
+    } : undefined;
+
+    const tapeBgClass = customTapeColor
+      ? 'washi-tape'
+      : photo.tapeColor === 'coral'
+      ? 'washi-tape-coral'
+      : photo.tapeColor === 'mint'
+      ? 'washi-tape-mint'
+      : photo.tapeColor === 'lavender'
+      ? 'washi-tape-lavender'
+      : photo.tapeColor === 'sky'
+      ? 'washi-tape-sky'
+      : photo.tapeColor === 'sakura'
+      ? 'washi-tape-sakura'
+      : photo.tapeColor === 'matcha'
+      ? 'washi-tape-matcha'
+      : photo.tapeColor === 'caramel'
+      ? 'washi-tape-caramel'
+      : 'washi-tape';
 
     return (
       <div
@@ -179,8 +221,9 @@ export const TransformablePolaroid = forwardRef<PolaroidHandle, TransformablePol
           isSelected ? 'is-selected ring-2 ring-[#E68A00]' : ''
         } ${isDragging ? 'shadow-2xl scale-[1.02]' : ''}`}
       >
-        {/* 頂部紙膠帶 */}
+        {/* 頂部紙膠帶（支援預設名或任意自訂色碼） */}
         <div
+          style={customTapeStyle}
           className={`absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-5 ${tapeBgClass} rounded-sm shadow-sm pointer-events-none z-10`}
         />
 
